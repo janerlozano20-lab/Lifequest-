@@ -1393,6 +1393,84 @@
             to { transform: scale(1); opacity: 1; }
         }
 
+        /* NEW: Avatar Grid for Profile */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .avatar-option {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .avatar-option:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        /* NEW: Settings Toggle */
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+        }
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle.active {
+            background: var(--success);
+        }
+
+        .toggle-knob {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .toggle.active .toggle-knob {
+            left: 26px;
+        }
+
         @media (min-width: 768px) {
             .container {
                 max-width: 600px;
@@ -1460,7 +1538,7 @@
     </header>
 
     <div class="character-card">
-        <div class="character-avatar" onclick="changeAvatar()">
+        <div class="character-avatar" onclick="openProfileModal()">
             <div class="level-ring"></div>
             <span id="avatar-emoji">🧙‍♂️</span>
         </div>
@@ -1481,6 +1559,46 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">👤 Editar Perfil</h3>
+                <button class="modal-close" onclick="closeProfileModal()">×</button>
+            </div>
+            <form onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">Nombre de héroe</label>
+                    <input type="text" class="form-input" id="edit-name" maxlength="15" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Selecciona avatar</label>
+                    <div class="avatar-grid" id="avatar-grid"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Configuración</label>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <span>🔔</span> Notificaciones
+                        </div>
+                        <div class="toggle active" id="notif-toggle" onclick="toggleSetting('notifications')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <span>🔊</span> Sonidos
+                        </div>
+                        <div class="toggle active" id="sound-toggle" onclick="toggleSetting('sounds')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Guardar Cambios</button>
+            </form>
         </div>
     </div>
 
@@ -1710,6 +1828,10 @@
     </nav>
 
     <script>
+        // Extended avatars list - 16 options
+        const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟', '🦁', '🐉', '👑', '🦸', '🧝‍♀️', '🧛', '🤖', '👽'];
+
+        // Game State with settings
         const gameState = {
             user: {
                 name: 'Héroe',
@@ -1722,7 +1844,11 @@
                 streak: 0,
                 avatar: '🧙‍♂️',
                 totalCompleted: 0,
-                totalXp: 0
+                totalXp: 0,
+                settings: {
+                    notifications: true,
+                    sounds: true
+                }
             },
             party: {
                 code: 'XP7-9Q2',
@@ -1776,20 +1902,25 @@
         };
 
         let selectedDifficulty = 2;
-        const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟'];
+        let tempAvatar = '🧙‍♂️';
 
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadGame();
             renderAll();
             updateStats();
             setupChatInput();
+            requestNotificationPermission();
+            setInterval(checkReminders, 60000); // Check every minute
         });
 
+        // Load and Save
         function loadGame() {
             const saved = localStorage.getItem('lifequest_data_v2');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 Object.assign(gameState, parsed);
+                tempAvatar = gameState.user.avatar;
             }
         }
 
@@ -1797,6 +1928,106 @@
             localStorage.setItem('lifequest_data_v2', JSON.stringify(gameState));
         }
 
+        // Profile Functions
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.add('active');
+            document.getElementById('edit-name').value = gameState.user.name;
+            tempAvatar = gameState.user.avatar;
+            renderAvatarGrid();
+            updateToggles();
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.remove('active');
+        }
+
+        function renderAvatarGrid() {
+            const grid = document.getElementById('avatar-grid');
+            grid.innerHTML = avatars.map(avatar => `
+                <div class="avatar-option ${avatar === tempAvatar ? 'selected' : ''}" 
+                     onclick="selectAvatar('${avatar}')">
+                    ${avatar}
+                </div>
+            `).join('');
+        }
+
+        function selectAvatar(avatar) {
+            tempAvatar = avatar;
+            renderAvatarGrid();
+        }
+
+        function updateToggles() {
+            const notifToggle = document.getElementById('notif-toggle');
+            const soundToggle = document.getElementById('sound-toggle');
+            
+            notifToggle.classList.toggle('active', gameState.user.settings.notifications);
+            soundToggle.classList.toggle('active', gameState.user.settings.sounds);
+        }
+
+        function toggleSetting(setting) {
+            gameState.user.settings[setting] = !gameState.user.settings[setting];
+            updateToggles();
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            const newName = document.getElementById('edit-name').value.trim();
+            if (newName) gameState.user.name = newName;
+            gameState.user.avatar = tempAvatar;
+            saveGame();
+            updateUI();
+            closeProfileModal();
+            showToast('✅', 'Perfil Actualizado', 'Cambios guardados correctamente');
+        }
+
+        // Notifications
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        function sendNotification(title, body) {
+            if (gameState.user.settings.notifications && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body, icon: '⚔️' });
+            }
+        }
+
+        function checkReminders() {
+            const hour = new Date().getHours();
+            if (hour === 9 || hour === 20) {
+                const incomplete = Object.values(gameState.quests).flat().filter(q => !q.completed).length;
+                if (incomplete > 0) {
+                    sendNotification('LifeQuest', `Tienes ${incomplete} misiones pendientes hoy!`);
+                }
+            }
+        }
+
+        // Sound effects (simple beep)
+        function playSound(type) {
+            if (!gameState.user.settings.sounds) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            if (type === 'complete') {
+                oscillator.frequency.value = 800;
+                gainNode.gain.value = 0.1;
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } else if (type === 'levelup') {
+                oscillator.frequency.value = 1200;
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+
+        // Render Functions
         function renderAll() {
             renderQuests();
             renderParty();
@@ -1850,6 +2081,7 @@
                 gameState.user.totalXp += quest.xp;
                 quest.streak++;
                 
+                playSound('complete');
                 damageBoss(quest.xp);
                 
                 showToast('✨', '¡Misión Completada!', `+${quest.xp} XP • +${quest.gold} Oro`);
@@ -1880,6 +2112,7 @@
         }
 
         function bossDefeated() {
+            playSound('levelup');
             showToast('👹', '¡Jefe Derrotado!', 'Todos ganan +500 XP y +100 Oro');
             gameState.user.xp += 500;
             gameState.user.gold += 100;
@@ -1908,6 +2141,7 @@
                 gameState.user.maxHp += 10;
                 gameState.user.hp = gameState.user.maxHp;
                 
+                playSound('levelup');
                 showLevelUp(gameState.user.level);
             }
             updateUI();
@@ -2002,7 +2236,6 @@
                 addChatMessage('Tú', gameState.user.avatar, text);
                 input.value = '';
                 
-                // Simulated responses
                 setTimeout(() => {
                     const responses = [
                         { author: 'María', avatar: '⚔️', text: '¡Genial! 💪' },
@@ -2134,15 +2367,6 @@
             document.querySelector('form').reset();
         }
 
-        function changeAvatar() {
-            const currentIndex = avatars.indexOf(gameState.user.avatar);
-            const nextIndex = (currentIndex + 1) % avatars.length;
-            gameState.user.avatar = avatars[nextIndex];
-            saveGame();
-            updateUI();
-            renderParty();
-        }
-
         function shareParty() {
             const code = gameState.party.code;
             if (navigator.share) {
@@ -2188,6 +2412,10 @@
 
         document.getElementById('quest-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.getElementById('profile-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeProfileModal();
         });
     </script>
 </body>

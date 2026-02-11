@@ -1755,6 +1755,64 @@
         <h3 class="section-title">🏆 Logros</h3>
         <div class="achievements-list" id="achievements-list"></div>
     </section>
+        <!-- PROFILE SECTION -->
+    <section id="profile-section" class="section">
+        <div class="profile-header">
+            <div class="profile-avatar-large" onclick="openProfileEditModal()">
+                <span id="profile-avatar-emoji">🧙‍♂️</span>
+                <div class="edit-overlay">✏️</div>
+            </div>
+            <h2 class="profile-name" id="profile-display-name">Héroe</h2>
+            <p class="profile-email" id="profile-display-email">jugador@lifequest.com</p>
+            <div class="profile-stats-row">
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="profile-level">1</div>
+                    <div class="profile-stat-label">Nivel</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="profile-xp">0</div>
+                    <div class="profile-stat-label">XP Total</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="profile-joined">Hoy</div>
+                    <div class="profile-stat-label">Miembro desde</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-menu">
+            <div class="menu-item" onclick="openProfileEditModal()">
+                <span class="menu-icon">✏️</span>
+                <span class="menu-text">Editar Perfil</span>
+                <span class="menu-arrow">›</span>
+            </div>
+            <div class="menu-item" onclick="showSection('stats')">
+                <span class="menu-icon">📊</span>
+                <span class="menu-text">Mis Estadísticas</span>
+                <span class="menu-arrow">›</span>
+            </div>
+            <div class="menu-item" onclick="showSection('achievements-detail')">
+                <span class="menu-icon">🏆</span>
+                <span class="menu-text">Logros Desbloqueados</span>
+                <span class="menu-badge" id="achievements-count">2</span>
+            </div>
+            <div class="menu-item" onclick="exportData()">
+                <span class="menu-icon">💾</span>
+                <span class="menu-text">Exportar Datos</span>
+                <span class="menu-arrow">›</span>
+            </div>
+            <div class="menu-item" onclick="resetData()">
+                <span class="menu-icon" style="color: var(--danger);">🗑️</span>
+                <span class="menu-text" style="color: var(--danger);">Reiniciar Progreso</span>
+            </div>
+        </div>
+
+        <div class="profile-achievements-preview">
+            <h3 class="section-title">🏆 Últimos Logros</h3>
+            <div class="achievements-grid" id="profile-achievements-grid"></div>
+        </div>
+    </section>
+
 
     <button class="fab" onclick="openModal()">+</button>
 

@@ -1857,6 +1857,60 @@
             </form>
         </div>
     </div>
+    <!-- Profile Registration/Edit Modal -->
+<div class="modal-overlay" id="profile-edit-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="profile-modal-title">📝 Completa tu Perfil</h3>
+            <button class="modal-close" onclick="closeProfileEditModal()">×</button>
+        </div>
+        <form onsubmit="saveProfileData(event)">
+            <div class="form-group">
+                <label class="form-label">Nombre de héroe *</label>
+                <input type="text" class="form-input" id="profile-name-input" placeholder="Tu nombre" maxlength="20" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email (opcional)</label>
+                <input type="email" class="form-input" id="profile-email-input" placeholder="tu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tu avatar</label>
+                <div class="avatar-grid" id="edit-avatar-grid"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Preferencias</label>
+                <div class="settings-item">
+                    <div class="settings-label">
+                        <span>🔔</span> Notificaciones diarias
+                    </div>
+                    <div class="toggle active" id="pref-notifications" onclick="togglePreference('notifications')">
+                        <div class="toggle-knob"></div>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-label">
+                        <span>🔊</span> Efectos de sonido
+                    </div>
+                    <div class="toggle active" id="pref-sounds" onclick="togglePreference('sounds')">
+                        <div class="toggle-knob"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-info" id="profile-info-text" style="display: none;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1rem;">
+                    ℹ️ Puedes editar estos datos cuando quieras desde tu perfil.
+                </p>
+            </div>
+
+            <button type="submit" class="submit-btn" id="profile-submit-btn">Guardar Perfil</button>
+        </form>
+    </div>
+</div>
+
 
     <div class="toast-container" id="toast-container"></div>
 

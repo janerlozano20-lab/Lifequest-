@@ -1393,7 +1393,6 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* NEW: Avatar Grid for Profile */
         .avatar-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1425,7 +1424,6 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
         }
 
-        /* NEW: Settings Toggle */
         .settings-item {
             display: flex;
             justify-content: space-between;
@@ -1494,7 +1492,8 @@
             background: var(--primary);
             border-radius: 3px;
         }
-                /* PROFILE SECTION STYLES */
+
+        /* PROFILE SECTION STYLES */
         .profile-header {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
             border: 1px solid rgba(99, 102, 241, 0.3);
@@ -1668,8 +1667,138 @@
             border-radius: 0 8px 8px 0;
             margin-bottom: 1rem;
         }
-    </style>
 
+        /* ACHIEVEMENTS DETAIL SECTION */
+        .achievements-detail-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05));
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .achievements-detail-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievements-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .achievements-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+
+        .achievements-count-text {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .achievement-detail-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-detail-card.unlocked {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05));
+            border-color: var(--primary);
+        }
+
+        .achievement-detail-card.locked {
+            opacity: 0.6;
+        }
+
+        .achievement-detail-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .achievement-detail-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .achievement-detail-card.unlocked .achievement-detail-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            animation: glow 2s infinite;
+        }
+
+        .achievement-detail-info {
+            flex: 1;
+        }
+
+        .achievement-detail-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .achievement-detail-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-detail-date {
+            font-size: 0.75rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .achievement-detail-card.locked .achievement-detail-date {
+            color: #64748b;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--light);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -1779,20 +1908,19 @@
     </div>
 
     <div class="tabs">
-    <button class="tab active" onclick="showSection('quests')">
-        <span>⚔️</span> Misiones
-    </button>
-    <button class="tab" onclick="showSection('party')">
-        <span>👥</span> Party
-    </button>
-    <button class="tab" onclick="showSection('shop')">
-        <span>🎁</span> Tienda
-    </button>
-    <button class="tab" onclick="showSection('profile')">
-        <span>👤</span> Perfil
-    </button>
-</div>
-
+        <button class="tab active" onclick="showSection('quests')">
+            <span>⚔️</span> Misiones
+        </button>
+        <button class="tab" onclick="showSection('party')">
+            <span>👥</span> Party
+        </button>
+        <button class="tab" onclick="showSection('shop')">
+            <span>🎁</span> Tienda
+        </button>
+        <button class="tab" onclick="showSection('profile')">
+            <span>👤</span> Perfil
+        </button>
+    </div>
 
     <section id="quests-section" class="section active">
         <div class="category-card health">
@@ -1932,7 +2060,8 @@
         <h3 class="section-title">🏆 Logros</h3>
         <div class="achievements-list" id="achievements-list"></div>
     </section>
-        <!-- PROFILE SECTION -->
+
+    <!-- PROFILE SECTION -->
     <section id="profile-section" class="section">
         <div class="profile-header">
             <div class="profile-avatar-large" onclick="openProfileEditModal()">
@@ -1989,7 +2118,24 @@
             <div class="achievements-grid" id="profile-achievements-grid"></div>
         </div>
     </section>
-    
+
+    <!-- ACHIEVEMENTS DETAIL SECTION -->
+    <section id="achievements-detail-section" class="section">
+        <button class="back-btn" onclick="showSection('profile')">
+            <span>←</span> Volver al Perfil
+        </button>
+        
+        <div class="achievements-detail-header">
+            <h2 class="achievements-detail-title">🏆 Logros Desbloqueados</h2>
+            <p style="color: #94a3b8; font-size: 0.9rem;">Colecciona todos los logros completando misiones</p>
+            <div class="achievements-progress">
+                <div class="achievements-progress-fill" id="achievements-progress-bar" style="width: 40%"></div>
+            </div>
+            <div class="achievements-count-text" id="achievements-progress-text">2 de 5 logros desbloqueados</div>
+        </div>
+
+        <div id="achievements-detail-list"></div>
+    </section>
 
     <button class="fab" onclick="openModal()">+</button>
 
@@ -2034,60 +2180,60 @@
             </form>
         </div>
     </div>
+
     <!-- Profile Registration/Edit Modal -->
-<div class="modal-overlay" id="profile-edit-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title" id="profile-modal-title">📝 Completa tu Perfil</h3>
-            <button class="modal-close" onclick="closeProfileEditModal()">×</button>
+    <div class="modal-overlay" id="profile-edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="profile-modal-title">📝 Completa tu Perfil</h3>
+                <button class="modal-close" onclick="closeProfileEditModal()">×</button>
+            </div>
+            <form onsubmit="saveProfileData(event)">
+                <div class="form-group">
+                    <label class="form-label">Nombre de héroe *</label>
+                    <input type="text" class="form-input" id="profile-name-input" placeholder="Tu nombre" maxlength="20" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email (opcional)</label>
+                    <input type="email" class="form-input" id="profile-email-input" placeholder="tu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tu avatar</label>
+                    <div class="avatar-grid" id="edit-avatar-grid"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Preferencias</label>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <span>🔔</span> Notificaciones diarias
+                        </div>
+                        <div class="toggle active" id="pref-notifications" onclick="togglePreference('notifications')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <span>🔊</span> Efectos de sonido
+                        </div>
+                        <div class="toggle active" id="pref-sounds" onclick="togglePreference('sounds')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-info" id="profile-info-text" style="display: none;">
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1rem;">
+                        ℹ️ Puedes editar estos datos cuando quieras desde tu perfil.
+                    </p>
+                </div>
+
+                <button type="submit" class="submit-btn" id="profile-submit-btn">Guardar Perfil</button>
+            </form>
         </div>
-        <form onsubmit="saveProfileData(event)">
-            <div class="form-group">
-                <label class="form-label">Nombre de héroe *</label>
-                <input type="text" class="form-input" id="profile-name-input" placeholder="Tu nombre" maxlength="20" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Email (opcional)</label>
-                <input type="email" class="form-input" id="profile-email-input" placeholder="tu@email.com">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Tu avatar</label>
-                <div class="avatar-grid" id="edit-avatar-grid"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Preferencias</label>
-                <div class="settings-item">
-                    <div class="settings-label">
-                        <span>🔔</span> Notificaciones diarias
-                    </div>
-                    <div class="toggle active" id="pref-notifications" onclick="togglePreference('notifications')">
-                        <div class="toggle-knob"></div>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-label">
-                        <span>🔊</span> Efectos de sonido
-                    </div>
-                    <div class="toggle active" id="pref-sounds" onclick="togglePreference('sounds')">
-                        <div class="toggle-knob"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-info" id="profile-info-text" style="display: none;">
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1rem;">
-                    ℹ️ Puedes editar estos datos cuando quieras desde tu perfil.
-                </p>
-            </div>
-
-            <button type="submit" class="submit-btn" id="profile-submit-btn">Guardar Perfil</button>
-        </form>
     </div>
-</div>
-
 
     <div class="toast-container" id="toast-container"></div>
 
@@ -2097,7 +2243,7 @@
         <p style="color: #94a3b8; margin-top: 1rem;">Nuevas habilidades desbloqueadas</p>
     </div>
 
-        <nav class="bottom-nav">
+    <nav class="bottom-nav">
         <a href="#" class="nav-item active" onclick="showSection('quests'); return false;">
             <span class="nav-icon">⚔️</span>
             <span>Misiones</span>
@@ -2115,7 +2261,6 @@
             <span>Perfil</span>
         </a>
     </nav>
-
 
     <script>
         // Extended avatars list - 16 options
@@ -2183,8 +2328,8 @@
                 { id: 6, name: 'Café Especial', icon: '☕', cost: 30, desc: 'Tomar café en cafetería' }
             ],
             achievements: [
-                { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', unlocked: true },
-                { id: 2, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', unlocked: true },
+                { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', unlocked: true, unlockedDate: '2024-01-15' },
+                { id: 2, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', unlocked: true, unlockedDate: '2024-01-20' },
                 { id: 3, name: 'Cazador de Logros', desc: 'Desbloquea 5 logros', icon: '🏆', unlocked: false },
                 { id: 4, name: 'Millonario', desc: 'Acumula 500 de oro', icon: '💰', unlocked: false },
                 { id: 5, name: 'Veterano', desc: 'Alcanza nivel 10', icon: '🎖️', unlocked: false }
@@ -2193,10 +2338,12 @@
 
         let selectedDifficulty = 2;
         let tempAvatar = '🧙‍♂️';
+        let isFirstTime = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadGame();
+            checkFirstTime();
             renderAll();
             updateStats();
             setupChatInput();
@@ -2449,31 +2596,94 @@
 
         function checkAchievements() {
             const newUnlocks = [];
+            const now = new Date().toLocaleDateString();
             
             if (gameState.user.totalCompleted >= 1 && !gameState.achievements[0].unlocked) {
                 gameState.achievements[0].unlocked = true;
+                gameState.achievements[0].unlockedDate = now;
                 newUnlocks.push(gameState.achievements[0]);
             }
             
             const maxStreak = Math.max(...Object.values(gameState.quests).flat().map(q => q.streak));
             if (maxStreak >= 7 && !gameState.achievements[1].unlocked) {
                 gameState.achievements[1].unlocked = true;
+                gameState.achievements[1].unlockedDate = now;
                 newUnlocks.push(gameState.achievements[1]);
             }
             
             if (gameState.user.gold >= 500 && !gameState.achievements[3].unlocked) {
                 gameState.achievements[3].unlocked = true;
+                gameState.achievements[3].unlockedDate = now;
                 newUnlocks.push(gameState.achievements[3]);
             }
             
             if (gameState.user.level >= 10 && !gameState.achievements[4].unlocked) {
                 gameState.achievements[4].unlocked = true;
+                gameState.achievements[4].unlockedDate = now;
                 newUnlocks.push(gameState.achievements[4]);
+            }
+
+            // Check Cazador de Logros
+            const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
+            if (unlockedCount >= 5 && !gameState.achievements[2].unlocked) {
+                gameState.achievements[2].unlocked = true;
+                gameState.achievements[2].unlockedDate = now;
+                newUnlocks.push(gameState.achievements[2]);
             }
             
             newUnlocks.forEach(ach => {
                 showToast('🏆', '¡Logro Desbloqueado!', ach.name);
             });
+
+            if (newUnlocks.length > 0) {
+                renderAchievements();
+                updateProfileDisplay();
+            }
+        }
+
+        function renderAchievements() {
+            // Render in stats section
+            const container = document.getElementById('achievements-list');
+            if (container) {
+                container.innerHTML = gameState.achievements.map(ach => `
+                    <div class="achievement-item ${ach.unlocked ? 'unlocked' : ''}">
+                        <div class="achievement-icon">${ach.icon}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${ach.name}</div>
+                            <div class="achievement-desc">${ach.desc}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render detail view
+            renderAchievementsDetail();
+        }
+
+        function renderAchievementsDetail() {
+            const container = document.getElementById('achievements-detail-list');
+            if (!container) return;
+
+            const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
+            const totalCount = gameState.achievements.length;
+            const progressPercent = (unlockedCount / totalCount) * 100;
+
+            document.getElementById('achievements-progress-bar').style.width = progressPercent + '%';
+            document.getElementById('achievements-progress-text').textContent = 
+                `${unlockedCount} de ${totalCount} logros desbloqueados`;
+
+            container.innerHTML = gameState.achievements.map(ach => `
+                <div class="achievement-detail-card ${ach.unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-detail-icon">${ach.icon}</div>
+                    <div class="achievement-detail-info">
+                        <div class="achievement-detail-name">${ach.name}</div>
+                        <div class="achievement-detail-desc">${ach.desc}</div>
+                        <div class="achievement-detail-date">
+                            ${ach.unlocked ? `✓ Desbloqueado el ${ach.unlockedDate || 'Recientemente'}` : '🔒 Bloqueado'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function renderParty() {
@@ -2570,19 +2780,6 @@
             }
         }
 
-        function renderAchievements() {
-            const container = document.getElementById('achievements-list');
-            container.innerHTML = gameState.achievements.map(ach => `
-                <div class="achievement-item ${ach.unlocked ? 'unlocked' : ''}">
-                    <div class="achievement-icon">${ach.icon}</div>
-                    <div class="achievement-info">
-                        <div class="achievement-name">${ach.name}</div>
-                        <div class="achievement-desc">${ach.desc}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function updateUI() {
             document.getElementById('char-name').textContent = gameState.user.name;
             document.getElementById('char-class').textContent = `Nv. ${gameState.user.level} Aventurero`;
@@ -2608,13 +2805,24 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            document.getElementById(`${section}-section`).classList.add('active');
-            
-            const tabs = ['quests', 'party', 'shop', 'stats'];
-            const index = tabs.indexOf(section);
-            if (index >= 0) {
-                document.querySelectorAll('.tab')[index].classList.add('active');
-                document.querySelectorAll('.nav-item')[index].classList.add('active');
+            const sectionMap = {
+                'quests': 0,
+                'party': 1,
+                'shop': 2,
+                'profile': 3
+            };
+
+            if (section === 'stats') {
+                document.getElementById('stats-section').classList.add('active');
+                document.querySelectorAll('.tab')[3].classList.add('active');
+            } else if (section === 'achievements-detail') {
+                document.getElementById('achievements-detail-section').classList.add('active');
+                document.querySelectorAll('.tab')[3].classList.add('active');
+                renderAchievementsDetail();
+            } else if (sectionMap[section] !== undefined) {
+                document.getElementById(`${section}-section`).classList.add('active');
+                document.querySelectorAll('.tab')[sectionMap[section]].classList.add('active');
+                document.querySelectorAll('.nav-item')[sectionMap[section]].classList.add('active');
             }
         }
 
@@ -2700,6 +2908,7 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
+        // Event Listeners for modals
         document.getElementById('quest-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeModal();
         });
@@ -2707,9 +2916,8 @@
         document.getElementById('profile-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeProfileModal();
         });
-                // PROFILE FUNCTIONS
-        let isFirstTime = false;
 
+        // PROFILE FUNCTIONS
         function checkFirstTime() {
             const saved = localStorage.getItem('lifequest_profile');
             if (!saved) {
@@ -2823,7 +3031,9 @@
             document.getElementById('profile-level').textContent = gameState.user.level;
             document.getElementById('profile-xp').textContent = gameState.user.totalXp;
             document.getElementById('profile-joined').textContent = gameState.user.joinDate || 'Hoy';
-            document.getElementById('achievements-count').textContent = gameState.achievements.filter(a => a.unlocked).length;
+            
+            const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
+            document.getElementById('achievements-count').textContent = unlockedCount;
             
             const grid = document.getElementById('profile-achievements-grid');
             const unlockedAchievements = gameState.achievements.filter(a => a.unlocked).slice(-4);
@@ -2868,45 +3078,10 @@
             }
         }
 
-        // Override showSection for profile
-        const originalShowSection = showSection;
-        showSection = function(section) {
-            if (section === 'profile') {
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.getElementById('profile-section').classList.add('active');
-                document.querySelectorAll('.tab')[3].classList.add('active');
-                updateProfileDisplay();
-            } else {
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.getElementById(`${section}-section`).classList.add('active');
-                
-                const tabs = ['quests', 'party', 'shop', 'profile'];
-                const index = tabs.indexOf(section);
-                if (index >= 0) {
-                    document.querySelectorAll('.tab')[index].classList.add('active');
-                }
-            }
-        };
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadGame();
-            checkFirstTime();
-            renderAll();
-            updateStats();
-            setupChatInput();
-            requestNotificationPermission();
-            setInterval(checkReminders, 60000);
-        });
-
         // Close profile modal on outside click
         document.getElementById('profile-edit-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget && !isFirstTime) closeProfileEditModal();
         });
-    </script>
-
     </script>
 </body>
 </html>

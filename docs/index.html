@@ -446,16 +446,6 @@
             background: var(--success);
         }
 
-        .quest-item.resetting {
-            animation: resetPulse 0.5s;
-        }
-
-        @keyframes resetPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); background: rgba(99, 102, 241, 0.2); }
-            100% { transform: scale(1); }
-        }
-
         .quest-checkbox {
             width: 26px;
             height: 26px;
@@ -972,6 +962,42 @@
             transform: scale(0.9);
         }
 
+        /* SHOP STYLES */
+        .shop-categories {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .shop-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .shop-category-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .shop-category-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .shop-category-btn.active {
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            border-color: transparent;
+            color: white;
+        }
+
         .shop-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -987,22 +1013,29 @@
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .shop-item:hover {
             transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
         }
 
         .shop-item.locked {
             opacity: 0.5;
             filter: grayscale(0.8);
+            cursor: not-allowed;
         }
 
         .shop-item.locked:hover {
             transform: none;
             border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .shop-item.purchased {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
         }
 
         .shop-icon {
@@ -1041,6 +1074,118 @@
             background: rgba(255, 255, 255, 0.05);
             color: #64748b;
             border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .shop-item.purchased .shop-price {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .purchased-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--success);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* MY REWARDS SECTION */
+        .my-rewards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .my-rewards-count {
+            background: var(--gold);
+            color: var(--dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .rewards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .reward-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+        }
+
+        .reward-item:hover {
+            transform: translateX(5px);
+            border-color: var(--gold);
+        }
+
+        .reward-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .reward-info {
+            flex: 1;
+        }
+
+        .reward-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .reward-category {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .reward-date {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .use-reward-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .use-reward-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .use-reward-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .stats-grid {
@@ -1531,6 +1676,10 @@
             
             .members-grid {
                 grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .shop-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -2162,6 +2311,44 @@
             font-size: 0.7rem;
             margin-left: 0.5rem;
         }
+
+        /* SHOP TABS */
+        .shop-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .shop-tab {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .shop-tab.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        .empty-rewards {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-rewards-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
@@ -2413,8 +2600,30 @@
     </section>
 
     <section id="shop-section" class="section">
-        <h3 class="section-title">🎁 Tienda de Recompensas</h3>
-        <div class="shop-grid" id="shop-grid"></div>
+        <div class="shop-tabs">
+            <button class="shop-tab active" onclick="showShopTab('store')">🛒 Tienda</button>
+            <button class="shop-tab" onclick="showShopTab('myrewards')">🎁 Mis Recompensas</button>
+        </div>
+
+        <div id="shop-store">
+            <div class="shop-categories" id="shop-categories">
+                <button class="shop-category-btn active" onclick="filterShop('all')">Todos</button>
+                <button class="shop-category-btn" onclick="filterShop('entertainment')">🎬 Entretenimiento</button>
+                <button class="shop-category-btn" onclick="filterShop('food')">🍕 Comida</button>
+                <button class="shop-category-btn" onclick="filterShop('shopping')">🛍️ Compras</button>
+                <button class="shop-category-btn" onclick="filterShop('experience')">✨ Experiencias</button>
+                <button class="shop-category-btn" onclick="filterShop('luxury')">💎 Lujo</button>
+            </div>
+            <div class="shop-grid" id="shop-grid"></div>
+        </div>
+
+        <div id="shop-myrewards" style="display: none;">
+            <div class="my-rewards-header">
+                <h3 class="section-title" style="margin: 0;">Recompensas Compradas</h3>
+                <span class="my-rewards-count" id="my-rewards-count">0</span>
+            </div>
+            <div class="rewards-list" id="my-rewards-list"></div>
+        </div>
     </section>
 
     <section id="stats-section" class="section">
@@ -2812,7 +3021,7 @@
             { id: 74, name: 'Celebrador', desc: 'Organiza evento para otros', icon: '🎉', category: 'Social', requirement: 1, type: 'event_host' },
             { id: 75, name: 'Agradecido', desc: 'Expresa gratitud por 30 días', icon: '🙏', category: 'Social', requirement: 30, type: 'gratitude_streak' },
             { id: 76, name: 'Oyente', desc: 'Escucha activamente por 14 días', icon: '👂', category: 'Social', requirement: 14, type: 'listening_streak' },
-            { id: 77, name: 'Amoroso', desc: 'Dile \"te quiero\" a alguien por 30 días', icon: '❤️', category: 'Social', requirement: 30, type: 'love_streak' },
+            { id: 77, name: 'Amoroso', desc: 'Dile "te quiero" a alguien por 30 días', icon: '❤️', category: 'Social', requirement: 30, type: 'love_streak' },
             
             // Hogar y Organización - 14 logros
             { id: 78, name: 'Limpio', desc: 'Limpieza diaria por 7 días', icon: '🧹', category: 'Hogar', requirement: 7, type: 'cleaning_streak' },
@@ -2915,6 +3124,141 @@
             { id: 161, name: 'Anti-Pereza', desc: 'Vence la procrastinación 30 días', icon: '🦸', category: 'Anti-Procrastinación', requirement: 30, type: 'anti_laziness' }
         ];
 
+        // SHOP ITEMS - Más de 100 recompensas de "malos hábitos" caros
+        const shopItemsDB = [
+            // ENTRETENIMIENTO (20 items)
+            { id: 1, name: 'Episodio Netflix', icon: '📺', cost: 50, desc: 'Ver 1 episodio de tu serie favorita', category: 'entertainment' },
+            { id: 2, name: 'Maratón Netflix', icon: '🎬', cost: 150, desc: 'Ver 3 episodios seguidos', category: 'entertainment' },
+            { id: 3, name: 'Película Cine', icon: '🍿', cost: 200, desc: 'Ir al cine a ver una película', category: 'entertainment' },
+            { id: 4, name: 'Gaming 1h', icon: '🎮', cost: 40, desc: 'Jugar videojuegos por 1 hora', category: 'entertainment' },
+            { id: 5, name: 'Gaming 3h', icon: '🕹️', cost: 100, desc: 'Sesión gaming de 3 horas', category: 'entertainment' },
+            { id: 6, name: 'YouTube Premium', icon: '▶️', cost: 120, desc: 'Ver videos sin anuncios por 1 día', category: 'entertainment' },
+            { id: 7, name: 'TikTok 30min', icon: '📱', cost: 30, desc: 'Scroll infinito por 30 minutos', category: 'entertainment' },
+            { id: 8, name: 'TikTok 1h', icon: '📲', cost: 60, desc: 'Scroll infinito por 1 hora', category: 'entertainment' },
+            { id: 9, name: 'Instagram 30min', icon: '📸', cost: 35, desc: 'Stalkear por 30 minutos', category: 'entertainment' },
+            { id: 10, name: 'Twitter/X 30min', icon: '🐦', cost: 35, desc: 'Ver tweets por 30 minutos', category: 'entertainment' },
+            { id: 11, name: 'Twitch 1h', icon: '🎥', cost: 50, desc: 'Ver streams por 1 hora', category: 'entertainment' },
+            { id: 12, name: 'Anime 2 episodios', icon: '⛩️', cost: 80, desc: 'Ver 2 episodios de anime', category: 'entertainment' },
+            { id: 13, name: 'Manga 1 capítulo', icon: '📖', cost: 45, desc: 'Leer 1 capítulo de manga', category: 'entertainment' },
+            { id: 14, name: 'Música Premium', icon: '🎵', cost: 70, desc: 'Spotify/Apple Music sin límites', category: 'entertainment' },
+            { id: 15, name: 'Podcast 1h', icon: '🎧', cost: 40, desc: 'Escuchar podcast por 1 hora', category: 'entertainment' },
+            { id: 16, name: 'Documental', icon: '🎞️', cost: 90, desc: 'Ver documental completo', category: 'entertainment' },
+            { id: 17, name: 'Stand-up Comedy', icon: '🎤', cost: 100, desc: 'Ver show de comedia', category: 'entertainment' },
+            { id: 18, name: 'Realities 1h', icon: '📺', cost: 60, desc: 'Ver reality show por 1 hora', category: 'entertainment' },
+            { id: 19, name: 'Dorama 1 episodio', icon: '💕', cost: 70, desc: 'Ver 1 episodio de dorama', category: 'entertainment' },
+            { id: 20, name: 'K-Drama Maratón', icon: '🇰🇷', cost: 180, desc: 'Ver 3 episodios de K-Drama', category: 'entertainment' },
+
+            // COMIDA (25 items)
+            { id: 21, name: 'Pizza Completa', icon: '🍕', cost: 120, desc: 'Pedir pizza entera para ti', category: 'food' },
+            { id: 22, name: 'Hamburguesa Gourmet', icon: '🍔', cost: 100, desc: 'Hamburguesa de restaurante', category: 'food' },
+            { id: 23, name: 'Sushi Set', icon: '🍣', cost: 150, desc: 'Orden de sushi premium', category: 'food' },
+            { id: 24, name: 'Tacos 5 piezas', icon: '🌮', cost: 80, desc: 'Tacos al pastor/gourmet', category: 'food' },
+            { id: 25, name: 'Alitas BBQ', icon: '🍗', cost: 90, desc: 'Orden de alitas', category: 'food' },
+            { id: 26, name: 'Papas Fritas Grandes', icon: '🍟', cost: 50, desc: 'Papas fritas con toppings', category: 'food' },
+            { id: 27, name: 'Hot Dog Especial', icon: '🌭', cost: 60, desc: 'Hot dog con todo', category: 'food' },
+            { id: 28, name: 'Donas 2 piezas', icon: '🍩', cost: 40, desc: 'Donas glaseadas', category: 'food' },
+            { id: 29, name: 'Helado Premium', icon: '🍨', cost: 70, desc: 'Helado artesanal', category: 'food' },
+            { id: 30, name: 'Milkshake', icon: '🥤', cost: 55, desc: 'Malteada especial', category: 'food' },
+            { id: 31, name: 'Café Especialidad', icon: '☕', cost: 45, desc: 'Café de cafetería fancy', category: 'food' },
+            { id: 32, name: 'Bubble Tea', icon: '🧋', cost: 50, desc: 'Té de burbujas', category: 'food' },
+            { id: 33, name: 'Cerveza Artesanal', icon: '🍺', cost: 80, desc: 'Cerveza local artesanal', category: 'food' },
+            { id: 34, name: 'Cóctel', icon: '🍹', cost: 120, desc: 'Bebida alcohólica fancy', category: 'food' },
+            { id: 35, name: 'Vino Copa', icon: '🍷', cost: 100, desc: 'Copa de vino tinto/blanco', category: 'food' },
+            { id: 36, name: 'Whisky Shot', icon: '🥃', cost: 90, desc: 'Shot de whisky premium', category: 'food' },
+            { id: 37, name: 'Nachos Supreme', icon: '🧀', cost: 85, desc: 'Nachos con queso y toppings', category: 'food' },
+            { id: 38, name: 'Burrito Grande', icon: '🌯', cost: 95, desc: 'Burrito de carne/pollo', category: 'food' },
+            { id: 39, name: 'Ramen Bowl', icon: '🍜', cost: 110, desc: 'Ramen auténtico', category: 'food' },
+            { id: 40, name: 'Pho Vietnamita', icon: '🍲', cost: 100, desc: 'Sopa pho completa', category: 'food' },
+            { id: 41, name: 'Curry Japonés', icon: '🍛', cost: 105, desc: 'Curry katsu', category: 'food' },
+            { id: 42, name: 'Pad Thai', icon: '🥡', cost: 95, cost: 95, desc: 'Noodles tailandeses', category: 'food' },
+            { id: 43, name: 'Churros con Chocolate', icon: '🥨', cost: 55, desc: 'Churros españoles', category: 'food' },
+            { id: 44, name: 'Crep Dulce', icon: '🥞', cost: 60, desc: 'Crepa con nutella/frutas', category: 'food' },
+            { id: 45, name: 'Waffle Belgas', icon: '🧇', cost: 65, desc: 'Waffle con toppings', category: 'food' },
+
+            // COMPRAS (20 items)
+            { id: 46, name: 'Ropa Nueva', icon: '👕', cost: 300, desc: 'Comprar prenda de ropa', category: 'shopping' },
+            { id: 47, name: 'Zapatos Nuevos', icon: '👟', cost: 500, desc: 'Par de zapatillas/zapatos', category: 'shopping' },
+            { id: 48, name: 'Accesorio Moda', icon: '👜', cost: 200, desc: 'Bolsa/cinturón/gorra', category: 'shopping' },
+            { id: 49, name: 'Maquillaje', icon: '💄', cost: 250, desc: 'Producto de belleza', category: 'shopping' },
+            { id: 50, name: 'Skincare Producto', icon: '🧴', cost: 180, desc: 'Crema/serum facial', category: 'shopping' },
+            { id: 51, name: 'Perfume', icon: '🌸', cost: 400, desc: 'Fragancia nueva', category: 'shopping' },
+            { id: 52, name: 'Videojuego', icon: '💿', cost: 600, desc: 'Juego nuevo para consola/PC', category: 'shopping' },
+            { id: 53, name: 'Skin Fortnite', icon: '🎮', cost: 150, desc: 'Skin o emote de juego', category: 'shopping' },
+            { id: 54, name: 'Libro Físico', icon: '📚', cost: 220, desc: 'Libro nuevo tapa dura', category: 'shopping' },
+            { id: 55, name: 'Comic/Manga', icon: '📙', cost: 120, desc: 'Tomo de comic o manga', category: 'shopping' },
+            { id: 56, name: 'Funko Pop', icon: '🎎', cost: 180, desc: 'Figura coleccionable', category: 'shopping' },
+            { id: 57, name: 'Póster', icon: '🖼️', cost: 100, desc: 'Póster decorativo', category: 'shopping' },
+            { id: 58, name: 'Audífonos', icon: '🎧', cost: 350, desc: 'Audífonos nuevos', category: 'shopping' },
+            { id: 59, name: 'Cargador', icon: '🔌', cost: 150, desc: 'Cargador/cable nuevo', category: 'shopping' },
+            { id: 60, name: 'Funda Teléfono', icon: '📱', cost: 120, desc: 'Funda/case nuevo', category: 'shopping' },
+            { id: 61, name: 'Reloj/Accesorio', icon: '⌚', cost: 450, desc: 'Reloj o joyería', category: 'shopping' },
+            { id: 62, name: 'Gafas de Sol', icon: '🕶️', cost: 380, desc: 'Lentes de sol', category: 'shopping' },
+            { id: 63, name: 'Mochila/Bolsa', icon: '🎒', cost: 320, desc: 'Mochila o bolso nuevo', category: 'shopping' },
+            { id: 64, name: 'Gorra/Sombrero', icon: '🧢', cost: 160, desc: 'Gorra de marca', category: 'shopping' },
+            { id: 65, name: 'Calcetines Divertidos', icon: '🧦', cost: 80, desc: 'Par de calcetines cool', category: 'shopping' },
+
+            // EXPERIENCIAS (20 items)
+            { id: 66, name: 'Día de Spa', icon: '💆', cost: 400, desc: 'Masaje o tratamiento spa', category: 'experience' },
+            { id: 67, name: 'Manicure/Pedicure', icon: '💅', cost: 200, desc: 'Sesión de uñas', category: 'experience' },
+            { id: 68, name: 'Corte de Pelo', icon: '💇', cost: 250, desc: 'Corte y estilizado', category: 'experience' },
+            { id: 69, name: 'Baño de Burbujas', icon: '🛁', cost: 150, desc: 'Baño relajante largo', category: 'experience' },
+            { id: 70, name: 'Noche de Fiesta', icon: '🎉', cost: 500, desc: 'Salir a bailar/bar', category: 'experience' },
+            { id: 71, name: 'Karaoke', icon: '🎤', cost: 180, desc: 'Sesión de karaoke', category: 'experience' },
+            { id: 72, name: 'Bowling', icon: '🎳', cost: 200, desc: 'Partida de boliche', category: 'experience' },
+            { id: 73, name: 'Billar', icon: '🎱', cost: 120, desc: 'Jugar pool/billar', category: 'experience' },
+            { id: 74, name: 'Arcade', icon: '👾', cost: 150, desc: 'Jugar en arcade', category: 'experience' },
+            { id: 75, name: 'Escape Room', icon: '🔐', cost: 450, desc: 'Juego de escape', category: 'experience' },
+            { id: 76, name: 'Láser Tag', icon: '🔫', cost: 280, desc: 'Juego de láser', category: 'experience' },
+            { id: 77, name: 'Go Karts', icon: '🏎️', cost: 350, desc: 'Carrera de go karts', category: 'experience' },
+            { id: 78, name: 'Mini Golf', icon: '⛳', cost: 200, cost: 200, desc: 'Partida mini golf', category: 'experience' },
+            { id: 79, name: 'Cine IMAX', icon: '🎦', cost: 280, desc: 'Película en IMAX/4DX', category: 'experience' },
+            { id: 80, name: 'Concierto Local', icon: '🎸', cost: 600, desc: 'Boletos concierto pequeño', category: 'experience' },
+            { id: 81, name: 'Stand-up En Vivo', icon: '🎭', cost: 400, desc: 'Show de comedia en vivo', category: 'experience' },
+            { id: 82, name: 'Museo/Exposición', icon: '🏛️', cost: 180, desc: 'Entrada a museo', category: 'experience' },
+            { id: 83, name: 'Zoológico', icon: '🦁', cost: 250, desc: 'Visita al zoológico', category: 'experience' },
+            { id: 84, name: 'Acuario', icon: '🐠', cost: 300, desc: 'Visita al acuario', category: 'experience' },
+            { id: 85, name: 'Parque de Diversiones', icon: '🎡', cost: 550, desc: 'Día en feria/parque', category: 'experience' },
+
+            // LUJO (15 items) - Más caros
+            { id: 86, name: 'Cena Fancy', icon: '🍽️', cost: 800, desc: 'Cena en restaurante caro', category: 'luxury' },
+            { id: 87, name: 'Botella Vino', icon: '🍾', cost: 600, desc: 'Botella de vino premium', category: 'luxury' },
+            { id: 88, name: 'Whisky Botella', icon: '🥃', cost: 1200, desc: 'Whisky de colección', category: 'luxury' },
+            { id: 89, name: 'Reloj de Lujo', icon: '⌚', cost: 5000, desc: 'Reloj marca premium', category: 'luxury' },
+            { id: 90, name: 'Bolso Diseñador', icon: '👜', cost: 3500, desc: 'Bolso marca de lujo', category: 'luxury' },
+            { id: 91, name: 'Zapatos de Marca', icon: '👠', cost: 2800, desc: 'Zapatos diseñador', category: 'luxury' },
+            { id: 92, name: 'Chamarra de Cuero', icon: '🧥', cost: 3200, desc: 'Chamarra piel genuina', category: 'luxury' },
+            { id: 93, name: 'Joyas', icon: '💍', cost: 4500, desc: 'Anillo/collar/cadena oro', category: 'luxury' },
+            { id: 94, name: 'iPhone/Android', icon: '📱', cost: 8000, desc: 'Teléfono nuevo flagship', category: 'luxury' },
+            { id: 95, name: 'Laptop/Tablet', icon: '💻', cost: 6000, desc: 'Computadora nueva', category: 'luxury' },
+            { id: 96, name: 'Consola Nueva', icon: '🎮', cost: 4500, desc: 'PS5/Xbox/Switch', category: 'luxury' },
+            { id: 97, name: 'TV 4K', icon: '📺', cost: 7000, desc: 'Televisor 55" o más', category: 'luxury' },
+            { id: 98, name: 'Viaje Corto', icon: '✈️', cost: 10000, desc: 'Fin de semana fuera', category: 'luxury' },
+            { id: 99, name: 'Concierto VIP', icon: '🎫', cost: 3500, desc: 'Boletos VIP concierto', category: 'luxury' },
+            { id: 100, name: 'Cena Michelin', icon: '⭐', cost: 5000, desc: 'Restaurante estrella Michelin', category: 'luxury' },
+
+            // EXTRAS (20 items)
+            { id: 101, name: 'Día de Descanso', icon: '😴', cost: 300, desc: 'Día libre sin responsabilidades', category: 'experience' },
+            { id: 102, name: 'Siesta Extendida', icon: '🛌', cost: 100, desc: 'Dormir 2 horas extra', category: 'experience' },
+            { id: 103, name: 'Desayuno en Cama', icon: '🍳', cost: 150, desc: 'Almorzar sin levantarse', category: 'food' },
+            { id: 104, name: 'Comida a Domicilio', icon: '🛵', cost: 80, desc: 'Pedir comida sin cocinar', category: 'food' },
+            { id: 105, name: 'Postre Delivery', icon: '🍰', cost: 120, desc: 'Pedir postre a domicilio', category: 'food' },
+            { id: 106, name: 'Café Delivery', icon: '☕', cost: 70, desc: 'Café a domicilio', category: 'food' },
+            { id: 107, name: 'Tarjeta Regalo', icon: '🎁', cost: 500, desc: 'Gift card para ti mismo', category: 'shopping' },
+            { id: 108, name: 'Suscripción Mensual', icon: '📅', cost: 200, desc: 'Netflix/Spotify/HBO', category: 'entertainment' },
+            { id: 109, name: 'Libro Digital', icon: '📱', cost: 150, desc: 'E-book en Kindle', category: 'shopping' },
+            { id: 110, name: 'Curso Online', icon: '🎓', cost: 800, desc: 'Curso de Udemy/Coursera', category: 'experience' },
+            { id: 111, name: 'App Premium', icon: '📲', cost: 120, desc: 'Comprar app de pago', category: 'shopping' },
+            { id: 112, name: 'Emoji/Sticker Pack', icon: '😎', cost: 40, desc: 'Paquete de stickers', category: 'shopping' },
+            { id: 113, name: 'Filtro Instagram', icon: '✨', cost: 35, desc: 'Filtro premium', category: 'shopping' },
+            { id: 114, name: 'Lotería/Rifa', icon: '🎰', cost: 50, desc: 'Boleto de lotería', category: 'entertainment' },
+            { id: 115, name: 'Apuesta Amistosa', icon: '🏆', cost: 100, desc: 'Apuesta segura con amigos', category: 'entertainment' },
+            { id: 116, name: 'Coleccionable', icon: '🎴', cost: 300, desc: 'Carta/figura coleccionable', category: 'shopping' },
+            { id: 117, name: 'Planta Nueva', icon: '🌱', cost: 180, desc: 'Comprar planta decorativa', category: 'shopping' },
+            { id: 118, name: 'Vela Aromática', icon: '🕯️', cost: 120, desc: 'Vela scented fancy', category: 'shopping' },
+            { id: 119, name: 'Almohada Nueva', icon: '🛏️', cost: 350, desc: 'Almohada memory foam', category: 'shopping' },
+            { id: 120, name: 'Sábanas Suaves', icon: '🧵', cost: 400, desc: 'Juego de sábanas premium', category: 'shopping' }
+        ];
+
         // Game State
         let gameState = {
             user: {
@@ -2972,21 +3316,18 @@
                     { id: 5, title: 'Llamar a un familiar', difficulty: 2, completed: false, streak: 1, xp: 30, gold: 8, lastCompleted: null }
                 ]
             },
-            shop: [
-                { id: 1, name: 'Netflix 1h', icon: '📺', cost: 50, desc: 'Ver episodio de serie favorita' },
-                { id: 2, name: 'Pizza Saludable', icon: '🍕', cost: 100, desc: 'Pedir comida favorita' },
-                { id: 3, name: 'Libro Nuevo', icon: '📚', cost: 200, desc: 'Comprar libro deseado' },
-                { id: 4, name: 'Gaming 1h', icon: '🎮', cost: 40, desc: 'Jugar videojuegos' },
-                { id: 5, name: 'Día de Spa', icon: '🛁', cost: 150, desc: 'Baño relajante + skincare' },
-                { id: 6, name: 'Café Especial', icon: '☕', cost: 30, desc: 'Tomar café en cafetería' }
-            ],
+            shop: shopItemsDB.map(item => ({...item, purchased: false, purchaseDate: null})),
+            myRewards: [],
             achievements: JSON.parse(JSON.stringify(achievementsDB)),
             notifications: [],
             stats: {
                 questsByCategory: { health: 0, work: 0, mind: 0, social: 0 },
                 totalQuestsCreated: 5,
                 perfectDays: 0,
-                currentPerfectDayStreak: 0
+                currentPerfectDayStreak: 0,
+                shopBuys: 0,
+                profileEdits: 0,
+                bossesDefeated: 0
             }
         };
 
@@ -2996,6 +3337,7 @@
         let isFirstTime = false;
         let currentEditingQuest = null;
         let confirmCallback = null;
+        let currentShopFilter = 'all';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -3007,7 +3349,7 @@
             setupChatInput();
             requestNotificationPermission();
             setInterval(checkReminders, 60000);
-            setInterval(checkDailyReset, 60000); // Check every minute for reset
+            setInterval(checkDailyReset, 60000);
         });
 
         // Daily Reset System
@@ -3015,7 +3357,6 @@
             const now = new Date();
             const lastReset = gameState.user.lastResetDate ? new Date(gameState.user.lastResetDate) : null;
             
-            // Check if it's past 5:00 AM and we haven't reset today
             const today5AM = new Date(now);
             today5AM.setHours(5, 0, 0, 0);
             
@@ -3028,7 +3369,6 @@
             const now = new Date();
             gameState.user.lastResetDate = now.toISOString();
             
-            // Check if all quests were completed yesterday for streak
             const allCompleted = Object.values(gameState.quests).every(cat => 
                 cat.every(q => q.completed)
             );
@@ -3051,7 +3391,6 @@
                 gameState.stats.currentPerfectDayStreak = 0;
             }
             
-            // Reset all quests
             Object.keys(gameState.quests).forEach(category => {
                 gameState.quests[category].forEach(quest => {
                     if (quest.completed) {
@@ -3094,7 +3433,7 @@
 
         // Load and Save
         function loadGame() {
-            const saved = localStorage.getItem('lifequest_data_v2');
+            const saved = localStorage.getItem('lifequest_data_v3');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 gameState = { ...gameState, ...parsed };
@@ -3102,12 +3441,19 @@
                 if (parsed.achievements) gameState.achievements = parsed.achievements;
                 if (parsed.notifications) gameState.notifications = parsed.notifications;
                 if (parsed.stats) gameState.stats = { ...gameState.stats, ...parsed.stats };
+                if (parsed.myRewards) gameState.myRewards = parsed.myRewards;
+                if (parsed.shop) {
+                    // Merge with new items if any
+                    const savedIds = parsed.shop.map(i => i.id);
+                    const newItems = shopItemsDB.filter(i => !savedIds.includes(i.id));
+                    gameState.shop = [...parsed.shop, ...newItems.map(i => ({...i, purchased: false, purchaseDate: null}))];
+                }
                 tempAvatar = gameState.user.avatar;
             }
         }
 
         function saveGame() {
-            localStorage.setItem('lifequest_data_v2', JSON.stringify(gameState));
+            localStorage.setItem('lifequest_data_v3', JSON.stringify(gameState));
         }
 
         // Profile Functions
@@ -3214,6 +3560,7 @@
             renderQuests();
             renderParty();
             renderShop();
+            renderMyRewards();
             renderAchievements();
             renderChat();
             renderNotifications();
@@ -3304,7 +3651,6 @@
             document.getElementById('edit-quest-name').value = quest.title;
             document.getElementById('edit-quest-category-select').value = category;
             
-            // Set difficulty
             editDifficulty = quest.difficulty;
             document.querySelectorAll('[data-edit-diff]').forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.dataset.editDiff) === quest.difficulty);
@@ -3341,13 +3687,11 @@
                 return;
             }
             
-            // Update quest
             quest.title = newTitle;
             quest.difficulty = editDifficulty;
             quest.xp = editDifficulty * 15;
             quest.gold = editDifficulty * 5;
             
-            // Move to different category if changed
             if (newCategory !== category) {
                 const questIndex = gameState.quests[category].findIndex(q => q.id === questId);
                 if (questIndex > -1) {
@@ -3477,7 +3821,6 @@
                         shouldUnlock = unlockedCount >= ach.requirement;
                         break;
                     case 'shop_buy':
-                        // Check if any shop item was bought (track in stats)
                         shouldUnlock = gameState.stats.shopBuys >= ach.requirement;
                         break;
                     case 'profile_edit':
@@ -3515,7 +3858,6 @@
         }
 
         function renderAchievements() {
-            // Render in stats section (recent only)
             const container = document.getElementById('achievements-list');
             if (container) {
                 const recentAchievements = gameState.achievements
@@ -3538,7 +3880,6 @@
                 }
             }
 
-            // Render detail view
             renderAchievementsDetail();
         }
 
@@ -3557,10 +3898,8 @@
             if (progressBar) progressBar.style.width = progressPercent + '%';
             if (progressText) progressText.textContent = `${unlockedCount} de ${totalCount} logros desbloqueados`;
 
-            // Get unique categories
             const categories = [...new Set(gameState.achievements.map(a => a.category))];
             
-            // Render category buttons
             categoriesContainer.innerHTML = categories.map(cat => {
                 const catAchievements = gameState.achievements.filter(a => a.category === cat);
                 const catUnlocked = catAchievements.filter(a => a.unlocked).length;
@@ -3571,7 +3910,6 @@
                 `;
             }).join('');
 
-            // Render achievements
             renderAchievementsList(gameState.achievements);
         }
 
@@ -3579,7 +3917,6 @@
             const filtered = gameState.achievements.filter(a => a.category === category);
             renderAchievementsList(filtered);
             
-            // Update active button
             document.querySelectorAll('.achievement-category-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent.includes(category));
             });
@@ -3596,11 +3933,6 @@
                         <div class="achievement-detail-date">
                             ${ach.unlocked ? `✓ Desbloqueado el ${ach.unlockedDate || 'Recientemente'}` : '🔒 Bloqueado'}
                         </div>
-                        ${!ach.unlocked ? `
-                            <div class="achievement-progress-mini">
-                                <div class="achievement-progress-mini-fill" style="width: ${Math.min(100, (ach.progress || 0) / ach.requirement * 100)}%"></div>
-                            </div>
-                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -3674,33 +4006,149 @@
             renderChat();
         }
 
+        // SHOP FUNCTIONS
         function renderShop() {
             const container = document.getElementById('shop-grid');
-            container.innerHTML = gameState.shop.map(item => {
-                const canBuy = gameState.user.gold >= item.cost;
+            const filteredItems = currentShopFilter === 'all' 
+                ? gameState.shop 
+                : gameState.shop.filter(item => item.category === currentShopFilter);
+            
+            container.innerHTML = filteredItems.map(item => {
+                const canBuy = gameState.user.gold >= item.cost && !item.purchased;
+                const isPurchased = item.purchased;
+                
                 return `
-                    <div class="shop-item ${!canBuy ? 'locked' : ''}" onclick="${canBuy ? `buyItem(${item.id})` : ''}">
+                    <div class="shop-item ${!canBuy && !isPurchased ? 'locked' : ''} ${isPurchased ? 'purchased' : ''}" 
+                         onclick="${canBuy ? `buyItem(${item.id})` : ''}">
+                        ${isPurchased ? '<span class="purchased-badge">✓ COMPRADO</span>' : ''}
                         <span class="shop-icon">${item.icon}</span>
                         <div class="shop-name">${item.name}</div>
                         <div class="shop-desc">${item.desc}</div>
-                        <div class="shop-price">${item.cost} 🪙</div>
+                        <div class="shop-price">${isPurchased ? 'ADQUIRIDO' : item.cost + ' 🪙'}</div>
                     </div>
                 `;
             }).join('');
         }
 
+        function filterShop(category) {
+            currentShopFilter = category;
+            
+            document.querySelectorAll('.shop-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'Todos') || 
+                    (category !== 'all' && btn.textContent.toLowerCase().includes(category))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderShop();
+        }
+
         function buyItem(id) {
             const item = gameState.shop.find(i => i.id === id);
+            if (!item || item.purchased) return;
+            
             if (gameState.user.gold >= item.cost) {
                 gameState.user.gold -= item.cost;
+                item.purchased = true;
+                item.purchaseDate = new Date().toLocaleDateString();
+                
+                // Add to my rewards
+                gameState.myRewards.push({
+                    ...item,
+                    used: false,
+                    acquiredDate: item.purchaseDate
+                });
+                
                 gameState.stats.shopBuys = (gameState.stats.shopBuys || 0) + 1;
-                showToast('🎁', 'Recompensa Comprada', `Disfruta: ${item.name}`);
-                addNotification('Compra Exitosa', `Has comprado: ${item.name}`, '🛒');
+                
+                showToast('🎁', '¡Recompensa Comprada!', `Has comprado: ${item.name}`);
+                addNotification('Compra Exitosa', `Has comprado: ${item.name} por ${item.cost} oro`, '🛒');
+                
                 checkAchievements();
                 saveGame();
                 updateStats();
                 renderShop();
+                renderMyRewards();
+            } else {
+                showToast('❌', 'Oro Insuficiente', `Necesitas ${item.cost} oro para comprar esto`);
             }
+        }
+
+        function showShopTab(tab) {
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'store') {
+                document.getElementById('shop-store').style.display = 'block';
+                document.getElementById('shop-myrewards').style.display = 'none';
+            } else {
+                document.getElementById('shop-store').style.display = 'none';
+                document.getElementById('shop-myrewards').style.display = 'block';
+                renderMyRewards();
+            }
+        }
+
+        function renderMyRewards() {
+            const container = document.getElementById('my-rewards-list');
+            const count = document.getElementById('my-rewards-count');
+            
+            if (count) count.textContent = gameState.myRewards.length;
+            
+            if (gameState.myRewards.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-rewards">
+                        <div class="empty-rewards-icon">🎁</div>
+                        <div class="empty-rewards-text">No has comprado recompensas aún</div>
+                        <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">¡Completa misiones para ganar oro y comprar recompensas!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = gameState.myRewards.map((reward, index) => `
+                <div class="reward-item">
+                    <div class="reward-icon">${reward.icon}</div>
+                    <div class="reward-info">
+                        <div class="reward-name">${reward.name}</div>
+                        <div class="reward-category">${getCategoryName(reward.category)} • ${reward.acquiredDate}</div>
+                    </div>
+                    <button class="use-reward-btn ${reward.used ? 'used' : ''}" 
+                            onclick="useReward(${index})" 
+                            ${reward.used ? 'disabled' : ''}>
+                        ${reward.used ? '✓ USADO' : 'USAR'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryName(cat) {
+            const names = {
+                'entertainment': '🎬 Entretenimiento',
+                'food': '🍕 Comida',
+                'shopping': '🛍️ Compras',
+                'experience': '✨ Experiencias',
+                'luxury': '💎 Lujo'
+            };
+            return names[cat] || cat;
+        }
+
+        function useReward(index) {
+            const reward = gameState.myRewards[index];
+            if (!reward || reward.used) return;
+            
+            showConfirmDialog(
+                '¿Usar recompensa?',
+                `¿Quieres usar "${reward.name}" ahora?`,
+                reward.icon,
+                () => {
+                    reward.used = true;
+                    reward.usedDate = new Date().toLocaleDateString();
+                    saveGame();
+                    renderMyRewards();
+                    showToast('🎉', '¡Recompensa Usada!', `Has disfrutado: ${reward.name}`);
+                }
+            );
         }
 
         // Notifications System
@@ -3727,14 +4175,12 @@
             
             if (!container) return;
             
-            // Update badge
             const unreadCount = gameState.notifications.filter(n => n.unread).length;
             if (badge) {
                 badge.textContent = unreadCount;
                 badge.style.display = unreadCount > 0 ? 'flex' : 'none';
             }
             
-            // Show/hide clear button
             if (clearBtn) {
                 clearBtn.style.display = gameState.notifications.length > 0 ? 'block' : 'none';
             }
@@ -4106,7 +4552,7 @@
                         'Esta es tu última oportunidad. ¿Deseas continuar?',
                         '🗑️',
                         () => {
-                            localStorage.removeItem('lifequest_data_v2');
+                            localStorage.removeItem('lifequest_data_v3');
                             localStorage.removeItem('lifequest_profile');
                             location.reload();
                         }

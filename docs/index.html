@@ -414,6 +414,7 @@
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            touch-action: pan-y;
         }
 
         .quest-item::before {
@@ -445,6 +446,16 @@
             background: var(--success);
         }
 
+        .quest-item.resetting {
+            animation: resetPulse 0.5s;
+        }
+
+        @keyframes resetPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background: rgba(99, 102, 241, 0.2); }
+            100% { transform: scale(1); }
+        }
+
         .quest-checkbox {
             width: 26px;
             height: 26px;
@@ -456,6 +467,7 @@
             flex-shrink: 0;
             transition: all 0.3s;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .quest-item:hover .quest-checkbox {
@@ -550,6 +562,48 @@
             align-items: center;
             justify-content: flex-end;
             gap: 0.2rem;
+        }
+
+        .quest-actions {
+            display: flex;
+            gap: 0.3rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .quest-item:hover .quest-actions {
+            opacity: 1;
+        }
+
+        .quest-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .quest-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .quest-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .quest-btn.edit {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .quest-btn.edit:hover {
+            background: rgba(99, 102, 241, 0.4);
         }
 
         .party-section {
@@ -1901,10 +1955,230 @@
         .empty-state-text {
             font-size: 1rem;
         }
+
+        /* ACHIEVEMENTS CATEGORIES */
+        .achievements-categories {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .achievements-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .achievement-category-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .achievement-category-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .achievement-category-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+        }
+
+        .achievement-progress-mini {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .achievement-progress-mini-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s;
+        }
+
+        /* CONFIRMATION DIALOG */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .confirm-dialog.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .confirm-box {
+            background: var(--dark);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .confirm-dialog.active .confirm-box {
+            transform: scale(1);
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .confirm-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .confirm-text {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .confirm-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+
+        .confirm-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .confirm-btn.confirm {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .confirm-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* DAILY RESET INFO */
+        .daily-reset-info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .daily-reset-info .icon {
+            font-size: 1.2rem;
+        }
+
+        /* QUEST EDIT MODAL */
+        .quest-edit-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quest-edit-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .quest-edit-btn.save {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .quest-edit-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .quest-edit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* LAST RESET INFO */
+        .last-reset-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="bg-animation"></div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirm-dialog" id="confirm-dialog">
+        <div class="confirm-box">
+            <div class="confirm-icon" id="confirm-icon">⚠️</div>
+            <div class="confirm-title" id="confirm-title">¿Estás seguro?</div>
+            <div class="confirm-text" id="confirm-text">Esta acción no se puede deshacer</div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" onclick="closeConfirmDialog()">Cancelar</button>
+                <button class="confirm-btn confirm" id="confirm-action-btn" onclick="executeConfirmAction()">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <header class="mobile-header">
         <div class="header-top">
@@ -1912,7 +2186,7 @@
             <div class="header-actions">
                 <button class="icon-btn" onclick="showSection('notifications')" title="Notificaciones">
                     🔔
-                    <span class="badge" id="notif-badge">2</span>
+                    <span class="badge" id="notif-badge" style="display: none;">0</span>
                 </button>
                 <button class="icon-btn" onclick="showSection('party')" title="Party">
                     👥
@@ -2025,6 +2299,11 @@
     </div>
 
     <section id="quests-section" class="section active">
+        <div class="daily-reset-info">
+            <span class="icon">🌅</span>
+            <span>Las misiones se reinician automáticamente cada día a las 5:00 AM</span>
+        </div>
+
         <div class="category-card health">
             <div class="category-header">
                 <div class="category-title-group">
@@ -2159,7 +2438,7 @@
             </div>
         </div>
 
-        <h3 class="section-title">🏆 Logros</h3>
+        <h3 class="section-title">🏆 Logros Recientes</h3>
         <div class="achievements-list" id="achievements-list"></div>
     </section>
 
@@ -2209,7 +2488,7 @@
                 <span class="menu-text">Exportar Datos</span>
                 <span class="menu-arrow">›</span>
             </div>
-            <div class="menu-item" onclick="resetData()">
+            <div class="menu-item" onclick="confirmResetData()">
                 <span class="menu-icon" style="color: var(--danger);">🗑️</span>
                 <span class="menu-text" style="color: var(--danger);">Reiniciar Progreso</span>
             </div>
@@ -2229,15 +2508,19 @@
         
         <div class="achievements-detail-header">
             <h2 class="achievements-detail-title">🏆 Logros Desbloqueados</h2>
-            <p style="color: #94a3b8; font-size: 0.9rem;">Colecciona todos los logros completando misiones</p>
+            <p style="color: #94a3b8; font-size: 0.9rem;">Colecciona los 161 logros disponibles</p>
             <div class="achievements-progress">
                 <div class="achievements-progress-fill" id="achievements-progress-bar" style="width: 0%"></div>
             </div>
-            <div class="achievements-count-text" id="achievements-progress-text">0 de 5 logros desbloqueados</div>
+            <div class="achievements-count-text" id="achievements-progress-text">0 de 161 logros desbloqueados</div>
+        </div>
+
+        <div class="achievements-categories" id="achievements-categories">
+            <!-- Categories will be rendered here -->
         </div>
 
         <div id="achievements-detail-list">
-            <!-- Los logros se renderizarán aquí -->
+            <!-- Achievements will be rendered here -->
         </div>
     </section>
 
@@ -2255,7 +2538,7 @@
         </button>
 
         <div id="notifications-list">
-            <!-- Las notificaciones se renderizarán aquí -->
+            <!-- Notifications will be rendered here -->
         </div>
     </section>
 
@@ -2299,6 +2582,58 @@
                 </div>
 
                 <button type="submit" class="submit-btn">Crear Misión</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quest Edit Modal -->
+    <div class="modal-overlay" id="quest-edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar Misión</h3>
+                <button class="modal-close" onclick="closeQuestEditModal()">×</button>
+            </div>
+            <form onsubmit="saveQuestEdit(event)">
+                <input type="hidden" id="edit-quest-id">
+                <input type="hidden" id="edit-quest-category">
+                <div class="form-group">
+                    <label class="form-label">Nombre de la misión</label>
+                    <input type="text" class="form-input" id="edit-quest-name" required maxlength="50">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" id="edit-quest-category-select">
+                        <option value="health">💚 Salud & Fitness</option>
+                        <option value="work">💼 Trabajo & Productividad</option>
+                        <option value="mind">🧘 Mente & Crecimiento</option>
+                        <option value="social">🤝 Social & Relaciones</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Dificultad</label>
+                    <div class="difficulty-selector">
+                        <button type="button" class="difficulty-btn" data-edit-diff="1" onclick="setEditDiff(1)">
+                            🟢<br>Fácil
+                        </button>
+                        <button type="button" class="difficulty-btn" data-edit-diff="2" onclick="setEditDiff(2)">
+                            🟡<br>Medio
+                        </button>
+                        <button type="button" class="difficulty-btn" data-edit-diff="3" onclick="setEditDiff(3)">
+                            🔴<br>Difícil
+                        </button>
+                    </div>
+                </div>
+
+                <div class="quest-edit-actions">
+                    <button type="button" class="quest-edit-btn delete" onclick="confirmDeleteQuest()">
+                        🗑️ Eliminar
+                    </button>
+                    <button type="submit" class="quest-edit-btn save">
+                        💾 Guardar
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -2388,7 +2723,199 @@
         // Extended avatars list - 16 options
         const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟', '🦁', '🐉', '👑', '🦸', '🧝‍♀️', '🧛', '🤖', '👽'];
 
-        // Game State with settings
+        // 161 Achievements Database
+        const achievementsDB = [
+            // Primeros Pasos (Tutorial) - 7 logros
+            { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', category: 'Primeros Pasos', requirement: 1, type: 'quests_completed' },
+            { id: 2, name: 'Apuntando Alto', desc: 'Completa 5 misiones', icon: '🎯', category: 'Primeros Pasos', requirement: 5, type: 'quests_completed' },
+            { id: 3, name: 'Estrella Naciente', desc: 'Alcanza nivel 5', icon: '⭐', category: 'Primeros Pasos', requirement: 5, type: 'level' },
+            { id: 4, name: 'Equipado', desc: 'Compra tu primera recompensa', icon: '🎒', category: 'Primeros Pasos', requirement: 1, type: 'shop_buy' },
+            { id: 5, name: 'Personalizado', desc: 'Edita tu perfil por primera vez', icon: '👤', category: 'Primeros Pasos', requirement: 1, type: 'profile_edit' },
+            { id: 6, name: 'Conectado', desc: 'Activa las notificaciones', icon: '🔔', category: 'Primeros Pasos', requirement: 1, type: 'notifications_on' },
+            { id: 7, name: 'Iniciado', desc: 'Abre la app 3 días seguidos', icon: '📱', category: 'Primeros Pasos', requirement: 3, type: 'login_streak' },
+            
+            // Rachas y Consistencia - 10 logros
+            { id: 8, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', category: 'Rachas', requirement: 7, type: 'daily_streak' },
+            { id: 9, name: 'Racha Eléctrica', desc: '14 días seguidos', icon: '⚡', category: 'Rachas', requirement: 14, type: 'daily_streak' },
+            { id: 10, name: 'Racha Estelar', desc: '30 días seguidos', icon: '🌟', category: 'Rachas', requirement: 30, type: 'daily_streak' },
+            { id: 11, name: 'Racha Diamante', desc: '60 días seguidos', icon: '💎', category: 'Rachas', requirement: 60, type: 'daily_streak' },
+            { id: 12, name: 'Racha Real', desc: '100 días seguidos', icon: '👑', category: 'Rachas', requirement: 100, type: 'daily_streak' },
+            { id: 13, name: 'Inquebrantable', desc: '365 días seguidos', icon: '🦸', category: 'Rachas', requirement: 365, type: 'daily_streak' },
+            { id: 14, name: 'Puntual', desc: 'Completa misiones antes de las 9am por 7 días', icon: '⏰', category: 'Rachas', requirement: 7, type: 'early_bird' },
+            { id: 15, name: 'Nocturno', desc: 'Completa misiones después de las 9pm por 7 días', icon: '🌙', category: 'Rachas', requirement: 7, type: 'night_owl' },
+            { id: 16, name: 'Perfecto', desc: 'Completa TODAS las misiones diarias por 7 días', icon: '🎯', category: 'Rachas', requirement: 7, type: 'perfect_week' },
+            { id: 17, name: 'Cien Por Ciento', desc: 'Completa TODAS las misiones por 30 días', icon: '💯', category: 'Rachas', requirement: 30, type: 'perfect_month' },
+            
+            // Salud y Fitness - 15 logros
+            { id: 18, name: 'Hidratado', desc: 'Bebe 2L de agua por 7 días', icon: '💧', category: 'Salud', requirement: 7, type: 'health_streak' },
+            { id: 19, name: 'Corredor', desc: 'Ejercicio 30 min por 7 días', icon: '🏃', category: 'Salud', requirement: 7, type: 'exercise_streak' },
+            { id: 20, name: 'Fortaleza', desc: 'Ejercicio 30 min por 30 días', icon: '💪', category: 'Salud', requirement: 30, type: 'exercise_streak' },
+            { id: 21, name: 'Nutrición', desc: 'Come saludable por 7 días', icon: '🥗', category: 'Salud', requirement: 7, type: 'nutrition_streak' },
+            { id: 22, name: 'Descansado', desc: 'Duerme 8 horas por 7 días', icon: '😴', category: 'Salud', requirement: 7, type: 'sleep_streak' },
+            { id: 23, name: 'Zen', desc: 'Meditación por 7 días seguidos', icon: '🧘', category: 'Salud', requirement: 7, type: 'meditation_streak' },
+            { id: 24, name: 'Caminante', desc: '10,000 pasos diarios por 7 días', icon: '🚶', category: 'Salud', requirement: 7, type: 'steps_streak' },
+            { id: 25, name: 'Levantador', desc: 'Entrenamiento de fuerza por 14 días', icon: '🏋️', category: 'Salud', requirement: 14, type: 'strength_streak' },
+            { id: 26, name: 'Maestro Zen', desc: 'Meditación por 30 días seguidos', icon: '🧘‍♀️', category: 'Salud', requirement: 30, type: 'meditation_streak' },
+            { id: 27, name: 'Vegano', desc: 'Come vegetariano por 14 días', icon: '🥦', category: 'Salud', requirement: 14, type: 'vegetarian_streak' },
+            { id: 28, name: 'Saludable', desc: 'Toma vitaminas por 30 días', icon: '💊', category: 'Salud', requirement: 30, type: 'vitamins_streak' },
+            { id: 29, name: 'Sonrisa', desc: 'Higiene dental perfecta por 30 días', icon: '🦷', category: 'Salud', requirement: 30, type: 'dental_streak' },
+            { id: 30, name: 'Ciclista', desc: 'Bicicleta 3 veces por semana durante 4 semanas', icon: '🚴', category: 'Salud', requirement: 12, type: 'cycling_count' },
+            { id: 31, name: 'Nadador', desc: 'Nada 2 veces por semana durante 4 semanas', icon: '🏊', category: 'Salud', requirement: 8, type: 'swimming_count' },
+            { id: 32, name: 'Escalador', desc: 'Escalada 4 veces en un mes', icon: '🧗', category: 'Salud', requirement: 4, type: 'climbing_count' },
+            
+            // Productividad y Trabajo - 15 logros
+            { id: 33, name: 'Profesional', desc: 'Deep work 2h por 5 días', icon: '💼', category: 'Productividad', requirement: 5, type: 'deep_work_streak' },
+            { id: 34, name: 'Productivo', desc: 'Deep work 2h por 30 días', icon: '🚀', category: 'Productividad', requirement: 30, type: 'deep_work_streak' },
+            { id: 35, name: 'Bandeja Cero', desc: 'Limpia tu email por 5 días', icon: '📧', category: 'Productividad', requirement: 5, type: 'inbox_zero_streak' },
+            { id: 36, name: 'Organizado', desc: 'Planifica tu día por 14 días', icon: '📝', category: 'Productividad', requirement: 14, type: 'planning_streak' },
+            { id: 37, name: 'Aprendiz', desc: 'Estudia 1h por 14 días', icon: '🎓', category: 'Productividad', requirement: 14, type: 'study_streak' },
+            { id: 38, name: 'Erudito', desc: 'Lee 30 min por 30 días', icon: '📚', category: 'Productividad', requirement: 30, type: 'reading_streak' },
+            { id: 39, name: 'Programador', desc: 'Codifica 1h por 14 días', icon: '💻', category: 'Productividad', requirement: 14, type: 'coding_streak' },
+            { id: 40, name: 'Creativo', desc: 'Trabajo creativo por 14 días', icon: '🎨', category: 'Productividad', requirement: 14, type: 'creative_streak' },
+            { id: 41, name: 'Analítico', desc: 'Análisis de datos por 7 días', icon: '📊', category: 'Productividad', requirement: 7, type: 'analysis_streak' },
+            { id: 42, name: 'Networker', desc: 'Contacto profesional por 7 días', icon: '🤝', category: 'Productividad', requirement: 7, type: 'networking_streak' },
+            { id: 43, name: 'Innovador', desc: 'Idea nueva implementada', icon: '💡', category: 'Productividad', requirement: 1, type: 'innovation_count' },
+            { id: 44, name: 'Eficiente', desc: 'Completa tareas antes de tiempo por 7 días', icon: '⏱️', category: 'Productividad', requirement: 7, type: 'efficiency_streak' },
+            { id: 45, name: 'Enfocado', desc: 'Sin distracciones por 4h, 7 días seguidos', icon: '🎯', category: 'Productividad', requirement: 7, type: 'focus_streak' },
+            { id: 46, name: 'Ascenso', desc: 'Completa un proyecto grande', icon: '📈', category: 'Productividad', requirement: 1, type: 'project_complete' },
+            { id: 47, name: 'Empleado del Mes', desc: 'Productividad máxima por 30 días', icon: '🏆', category: 'Productividad', requirement: 30, type: 'productivity_streak' },
+            
+            // Mente y Crecimiento Personal - 15 logros
+            { id: 48, name: 'Lector', desc: 'Lee 20 páginas por 14 días', icon: '📖', category: 'Mente', requirement: 14, type: 'pages_streak' },
+            { id: 49, name: 'Escritor', desc: 'Escribe 500 palabras por 14 días', icon: '✍️', category: 'Mente', requirement: 14, type: 'writing_streak' },
+            { id: 50, name: 'Melodía', desc: 'Práctica musical por 14 días', icon: '🎵', category: 'Mente', requirement: 14, type: 'music_streak' },
+            { id: 51, name: 'Orador', desc: 'Práctica de hablar en público', icon: '🗣️', category: 'Mente', requirement: 10, type: 'speaking_count' },
+            { id: 52, name: 'Mentalidad', desc: 'Visualización positiva por 21 días', icon: '🧠', category: 'Mente', requirement: 21, type: 'visualization_streak' },
+            { id: 53, name: 'Actor', desc: 'Actúa fuera de tu zona de confort', icon: '🎭', category: 'Mente', requirement: 5, type: 'comfort_zone_count' },
+            { id: 54, name: 'Crecimiento', desc: 'Nueva habilidad aprendida', icon: '🌱', category: 'Mente', requirement: 1, type: 'skill_learned' },
+            { id: 55, name: 'Equilibrio', desc: 'Meditación y ejercicio mismo día por 14 días', icon: '🎪', category: 'Mente', requirement: 14, type: 'balance_streak' },
+            { id: 56, name: 'Sabio', desc: 'Lee 1 libro por semana durante 4 semanas', icon: '🦉', category: 'Mente', requirement: 4, type: 'books_count' },
+            { id: 57, name: 'Graduado', desc: 'Completa un curso online', icon: '🎓', category: 'Mente', requirement: 1, type: 'course_complete' },
+            { id: 58, name: 'Explorador', desc: 'Aprende sobre un nuevo tema por 30 días', icon: '🗺️', category: 'Mente', requirement: 30, type: 'explore_streak' },
+            { id: 59, name: 'Científico', desc: 'Experimento o proyecto DIY completado', icon: '🔬', category: 'Mente', requirement: 1, type: 'experiment_count' },
+            { id: 60, name: 'Artista', desc: 'Crea arte por 21 días', icon: '🎨', category: 'Mente', requirement: 21, type: 'art_streak' },
+            { id: 61, name: 'Fotógrafo', desc: 'Toma 1 foto creativa diaria por 30 días', icon: '📸', category: 'Mente', requirement: 30, type: 'photo_streak' },
+            { id: 62, name: 'Director', desc: 'Crea contenido/video por 14 días', icon: '🎬', category: 'Mente', requirement: 14, type: 'content_streak' },
+            
+            // Social y Relaciones - 15 logros
+            { id: 63, name: 'Sociable', desc: 'Contacto con amigo por 7 días', icon: '👋', category: 'Social', requirement: 7, type: 'friend_streak' },
+            { id: 64, name: 'Romántico', desc: 'Cita o gesto de amor por 14 días', icon: '💑', category: 'Social', requirement: 14, type: 'romance_streak' },
+            { id: 65, name: 'Familiar', desc: 'Llamada familiar por 14 días', icon: '👨‍👩‍👧', category: 'Social', requirement: 14, type: 'family_streak' },
+            { id: 66, name: 'Generoso', desc: 'Acto de bondad por 14 días', icon: '🤗', category: 'Social', requirement: 14, type: 'kindness_streak' },
+            { id: 67, name: 'Comunicador', desc: 'Conversación profunda por 7 días', icon: '💬', category: 'Social', requirement: 7, type: 'deep_talk_streak' },
+            { id: 68, name: 'Detallista', desc: 'Regalo o sorpresa por 7 días', icon: '🎁', category: 'Social', requirement: 7, type: 'gift_streak' },
+            { id: 69, name: 'Anfitrión', desc: 'Cena/encuentro social por 4 semanas', icon: '🍽️', category: 'Social', requirement: 4, type: 'host_count' },
+            { id: 70, name: 'Mentor', desc: 'Ayuda a alguien por 14 días', icon: '🤝', category: 'Social', requirement: 14, type: 'mentor_streak' },
+            { id: 71, name: 'Líder', desc: 'Lidera un grupo o proyecto', icon: '👥', category: 'Social', requirement: 1, type: 'leadership_count' },
+            { id: 72, name: 'Networker Pro', desc: '5 nuevos contactos en un mes', icon: '🌐', category: 'Social', requirement: 5, type: 'new_contacts' },
+            { id: 73, name: 'Carta', desc: 'Escribe cartas/manuscritos por 7 días', icon: '💌', category: 'Social', requirement: 7, type: 'letter_streak' },
+            { id: 74, name: 'Celebrador', desc: 'Organiza evento para otros', icon: '🎉', category: 'Social', requirement: 1, type: 'event_host' },
+            { id: 75, name: 'Agradecido', desc: 'Expresa gratitud por 30 días', icon: '🙏', category: 'Social', requirement: 30, type: 'gratitude_streak' },
+            { id: 76, name: 'Oyente', desc: 'Escucha activamente por 14 días', icon: '👂', category: 'Social', requirement: 14, type: 'listening_streak' },
+            { id: 77, name: 'Amoroso', desc: 'Dile \"te quiero\" a alguien por 30 días', icon: '❤️', category: 'Social', requirement: 30, type: 'love_streak' },
+            
+            // Hogar y Organización - 14 logros
+            { id: 78, name: 'Limpio', desc: 'Limpieza diaria por 7 días', icon: '🧹', category: 'Hogar', requirement: 7, type: 'cleaning_streak' },
+            { id: 79, name: 'Chef', desc: 'Cocina en casa por 14 días', icon: '🍳', category: 'Hogar', requirement: 14, type: 'cooking_streak' },
+            { id: 80, name: 'Jardinero', desc: 'Cuida plantas por 30 días', icon: '🌿', category: 'Hogar', requirement: 30, type: 'gardening_streak' },
+            { id: 81, name: 'Paseador', desc: 'Pasea mascota por 30 días', icon: '🐕', category: 'Hogar', requirement: 30, type: 'dog_walk_streak' },
+            { id: 82, name: 'Organizado', desc: 'Lavandería y organización por 14 días', icon: '🧺', category: 'Hogar', requirement: 14, type: 'laundry_streak' },
+            { id: 83, name: 'Manitas', desc: 'Proyecto DIY por 4 semanas', icon: '🛠️', category: 'Hogar', requirement: 4, type: 'diy_count' },
+            { id: 84, name: 'Ahorrador', desc: 'Registra gastos por 30 días', icon: '💰', category: 'Hogar', requirement: 30, type: 'expense_tracking' },
+            { id: 85, name: 'Planificador', desc: 'Presupuesto mensual cumplido', icon: '📝', category: 'Hogar', requirement: 1, type: 'budget_met' },
+            { id: 86, name: 'Ecológico', desc: 'Recicla por 30 días', icon: '♻️', category: 'Hogar', requirement: 30, type: 'recycling_streak' },
+            { id: 87, name: 'Eficiente', desc: 'Reduce consumo energético', icon: '💡', category: 'Hogar', requirement: 1, type: 'energy_save' },
+            { id: 88, name: 'Comprador Inteligente', desc: 'Lista de compras por 4 semanas', icon: '🛒', category: 'Hogar', requirement: 4, type: 'shopping_list_streak' },
+            { id: 89, name: 'Meal Prep', desc: 'Prepara comidas por 14 días', icon: '🍱', category: 'Hogar', requirement: 14, type: 'meal_prep_streak' },
+            { id: 90, name: 'Brillante', desc: 'Limpieza profunda mensual por 3 meses', icon: '🧽', category: 'Hogar', requirement: 3, type: 'deep_clean_count' },
+            { id: 91, name: 'Dueño', desc: 'Mantenimiento hogar por 30 días', icon: '🏠', category: 'Hogar', requirement: 30, type: 'maintenance_streak' },
+            
+            // Riqueza y Economía - 10 logros
+            { id: 92, name: 'Ahorrista', desc: 'Ahorra 10% ingresos por 3 meses', icon: '💵', category: 'Riqueza', requirement: 3, type: 'saving_streak' },
+            { id: 93, name: 'Inversionista', desc: 'Primera inversión', icon: '💎', category: 'Riqueza', requirement: 1, type: 'first_investment' },
+            { id: 94, name: 'Banquero', desc: 'Saldo positivo creciente por 6 meses', icon: '🏦', category: 'Riqueza', requirement: 6, type: 'positive_balance' },
+            { id: 95, name: 'Libre', desc: 'Paga deuda', icon: '💳', category: 'Riqueza', requirement: 1, type: 'debt_free' },
+            { id: 96, name: 'Trader', desc: 'Inversión rentable', icon: '📈', category: 'Riqueza', requirement: 1, type: 'profitable_trade' },
+            { id: 97, name: 'Meta', desc: 'Alcanza meta de ahorro', icon: '🎯', category: 'Riqueza', requirement: 1, type: 'savings_goal' },
+            { id: 98, name: 'Millonario', desc: 'Acumula 1000 de oro', icon: '💰', category: 'Riqueza', requirement: 1000, type: 'gold_1000' },
+            { id: 99, name: 'Magnate', desc: 'Acumula 5000 de oro', icon: '🏆', category: 'Riqueza', requirement: 5000, type: 'gold_5000' },
+            { id: 100, name: 'Emperador', desc: 'Acumula 10000 de oro', icon: '👑', category: 'Riqueza', requirement: 10000, type: 'gold_10000' },
+            { id: 101, name: 'Analista', desc: 'Revisión financiera mensual por 6 meses', icon: '📊', category: 'Riqueza', requirement: 6, type: 'finance_review' },
+            
+            // Party y Social (Multiplayer) - 10 logros
+            { id: 102, name: 'Party Animal', desc: 'Únete a una party', icon: '👥', category: 'Party', requirement: 1, type: 'join_party' },
+            { id: 103, name: 'Cooperativo', desc: 'Completa misión con party', icon: '🤝', category: 'Party', requirement: 5, type: 'party_quests' },
+            { id: 104, name: 'Cazador', desc: 'Derrota 1 jefe semanal', icon: '👹', category: 'Party', requirement: 1, type: 'boss_defeat' },
+            { id: 105, name: 'Guerrero', desc: 'Derrota 5 jefes', icon: '⚔️', category: 'Party', requirement: 5, type: 'boss_defeat_count' },
+            { id: 106, name: 'Campeón', desc: 'Derrota 10 jefes', icon: '🏆', category: 'Party', requirement: 10, type: 'boss_defeat_count' },
+            { id: 107, name: 'Social', desc: 'Envía 50 mensajes en chat', icon: '💬', category: 'Party', requirement: 50, type: 'chat_messages' },
+            { id: 108, name: 'Líder de Party', desc: 'Sé líder por 30 días', icon: '🎖️', category: 'Party', requirement: 30, type: 'leader_streak' },
+            { id: 109, name: 'MVP', desc: 'Mayor daño a jefe 3 veces', icon: '🌟', category: 'Party', requirement: 3, type: 'mvp_count' },
+            { id: 110, name: 'Apoyo', desc: 'Motiva a compañero 10 veces', icon: '🤗', category: 'Party', requirement: 10, type: 'support_count' },
+            { id: 111, name: 'Veterano', desc: '30 días en party', icon: '🏅', category: 'Party', requirement: 30, type: 'party_streak' },
+            
+            // Eventos Especiales y Temporada - 10 logros
+            { id: 112, name: 'Festivo', desc: 'Completa misiones durante Navidad', icon: '🎄', category: 'Eventos', requirement: 7, type: 'christmas_quests' },
+            { id: 113, name: 'Espeluznante', desc: 'Halloween productivo', icon: '🎃', category: 'Eventos', requirement: 7, type: 'halloween_quests' },
+            { id: 114, name: 'Año Nuevo', desc: 'Metas de año nuevo cumplidas', icon: '🎆', category: 'Eventos', requirement: 1, type: 'new_year_goal' },
+            { id: 115, name: 'Romántico', desc: 'San Valentín especial', icon: '💘', category: 'Eventos', requirement: 1, type: 'valentine_quest' },
+            { id: 116, name: 'Gratitud', desc: 'Acción de gracias', icon: '🦃', category: 'Eventos', requirement: 1, type: 'thanksgiving_quest' },
+            { id: 117, name: 'Primavera', desc: 'Renovación de primavera', icon: '🌸', category: 'Eventos', requirement: 30, type: 'spring_streak' },
+            { id: 118, name: 'Verano', desc: 'Productividad de verano', icon: '☀️', category: 'Eventos', requirement: 30, type: 'summer_streak' },
+            { id: 119, name: 'Otoño', desc: 'Cosecha de logros', icon: '🍂', category: 'Eventos', requirement: 30, type: 'autumn_streak' },
+            { id: 120, name: 'Invierno', desc: 'Resistencia invernal', icon: '❄️', category: 'Eventos', requirement: 30, type: 'winter_streak' },
+            { id: 121, name: 'Cumpleaños', desc: 'Cumpleaños productivo', icon: '🎂', category: 'Eventos', requirement: 1, type: 'birthday_quest' },
+            
+            // Maestría y Colección - 10 logros
+            { id: 122, name: 'Cazador de Logros', desc: 'Desbloquea 50 logros', icon: '🏆', category: 'Maestría', requirement: 50, type: 'achievements_count' },
+            { id: 123, name: 'Coleccionista', desc: 'Desbloquea 100 logros', icon: '🎯', category: 'Maestría', requirement: 100, type: 'achievements_count' },
+            { id: 124, name: 'Completista', desc: 'Desbloquea TODOS los logros', icon: '💎', category: 'Maestría', requirement: 161, type: 'achievements_count' },
+            { id: 125, name: 'Veterano', desc: 'Alcanza nivel 50', icon: '⭐', category: 'Maestría', requirement: 50, type: 'level' },
+            { id: 126, name: 'Legendario', desc: 'Alcanza nivel 100', icon: '🌟', category: 'Maestría', requirement: 100, type: 'level' },
+            { id: 127, name: 'Inmortal', desc: 'Alcanza nivel 999', icon: '👑', category: 'Maestría', requirement: 999, type: 'level' },
+            { id: 128, name: 'Maestro', desc: 'Domina todas las categorías', icon: '🎖️', category: 'Maestría', requirement: 1, type: 'master_all' },
+            { id: 129, name: 'Icono', desc: 'Sé un ejemplo para otros', icon: '🏅', category: 'Maestría', requirement: 1, type: 'role_model' },
+            { id: 130, name: 'Héroe', desc: 'Impacto positivo en comunidad', icon: '🦸', category: 'Maestría', requirement: 1, type: 'community_impact' },
+            { id: 131, name: 'Superestrella', desc: 'Reconocimiento global', icon: '🌟', category: 'Maestría', requirement: 1, type: 'global_recognition' },
+            
+            // Desafíos Extremos - 10 logros
+            { id: 132, name: 'Imposible', desc: '100 días perfectos', icon: '🔥', category: 'Extremos', requirement: 100, type: 'perfect_days' },
+            { id: 133, name: 'Relámpago', desc: 'Completa 10 misiones en 1 día', icon: '⚡', category: 'Extremos', requirement: 10, type: 'quests_one_day' },
+            { id: 134, name: 'Insomne', desc: 'Productividad 24h', icon: '🌙', category: 'Extremos', requirement: 1, type: '24h_productive' },
+            { id: 135, name: 'Hércules', desc: '30 días de ejercicio intenso', icon: '💪', category: 'Extremos', requirement: 30, type: 'intense_exercise' },
+            { id: 136, name: 'Einstein', desc: 'Estudia 8h por 7 días', icon: '🧠', category: 'Extremos', requirement: 7, type: 'study_marathon' },
+            { id: 137, name: 'Rockefeller', desc: '10000 de oro sin gastar', icon: '💰', category: 'Extremos', requirement: 10000, type: 'gold_hoarder' },
+            { id: 138, name: 'Maratonista', desc: 'Corre 5K diario por 30 días', icon: '🏃', category: 'Extremos', requirement: 30, type: 'run_5k_streak' },
+            { id: 139, name: 'Bibliotecario', desc: 'Lee 5 libros en 1 mes', icon: '📚', category: 'Extremos', requirement: 5, type: 'books_month' },
+            { id: 140, name: 'Precisión', desc: '100% precisión por 30 días', icon: '🎯', category: 'Extremos', requirement: 30, type: 'accuracy_streak' },
+            { id: 141, name: 'Superhéroe', desc: 'Haz todo perfecto por 7 días', icon: '🦸', category: 'Extremos', requirement: 7, type: 'superhero_week' },
+            
+            // Curiosidades y Divertidos - 10 logros
+            { id: 142, name: 'Arcoíris', desc: 'Completa misiones de 5 colores diferentes', icon: '🌈', category: 'Divertidos', requirement: 5, type: 'color_variety' },
+            { id: 143, name: 'Aventurero', desc: 'Deja que el azar decida tu misión', icon: '🎲', category: 'Divertidos', requirement: 7, type: 'random_quest' },
+            { id: 144, name: 'Misterioso', desc: 'Misión secreta completada', icon: '🎭', category: 'Divertidos', requirement: 1, type: 'secret_quest' },
+            { id: 145, name: 'Circo', desc: 'Equilibra 5 categorías en 1 día', icon: '🎪', category: 'Divertidos', requirement: 1, type: 'balance_categories' },
+            { id: 146, name: 'Arte', desc: 'Misión creativa única', icon: '🎨', category: 'Divertidos', requirement: 1, type: 'unique_creative' },
+            { id: 147, name: 'Sinfonía', desc: 'Misión con música', icon: '🎵', category: 'Divertidos', requirement: 1, type: 'music_mission' },
+            { id: 148, name: 'Luna', desc: 'Misión nocturna especial', icon: '🌙', category: 'Divertidos', requirement: 1, type: 'night_mission' },
+            { id: 149, name: 'Sol', desc: 'Misión matutina 30 días', icon: '☀️', category: 'Divertidos', requirement: 30, type: 'morning_streak' },
+            { id: 150, name: 'Ola', desc: 'Ritmo perfecto por 21 días', icon: '🌊', category: 'Divertidos', requirement: 21, type: 'rhythm_streak' },
+            { id: 151, name: 'Futuro', desc: 'Planificación a largo plazo', icon: '🔮', category: 'Divertidos', requirement: 1, type: 'long_term_plan' },
+            
+            // Anti-Procrastinación - 10 logros
+            { id: 152, name: 'Rana', desc: 'Come la rana primero (tarea difícil)', icon: '🐸', category: 'Anti-Procrastinación', requirement: 7, type: 'eat_frog' },
+            { id: 153, name: '2 Minutos', desc: 'Regla de los 2 minutos por 14 días', icon: '⏰', category: 'Anti-Procrastinación', requirement: 14, type: 'two_minute_rule' },
+            { id: 154, name: 'Sin Excusas', desc: 'Sin procrastinar por 7 días', icon: '🚫', category: 'Anti-Procrastinación', requirement: 7, type: 'no_excuses' },
+            { id: 155, name: 'Ahora', desc: 'Tarea inmediata por 21 días', icon: '⚡', category: 'Anti-Procrastinación', requirement: 21, type: 'do_it_now' },
+            { id: 156, name: 'Enfoque', desc: 'Sin redes sociales por 4h, 7 días', icon: '🎯', category: 'Anti-Procrastinación', requirement: 7, type: 'no_social_media' },
+            { id: 157, name: 'Disciplina', desc: 'Sin distracciones por 30 días', icon: '🔒', category: 'Anti-Procrastinación', requirement: 30, type: 'no_distractions' },
+            { id: 158, name: 'Desconectado', desc: 'Modo avión productivo por 14 días', icon: '📵', category: 'Anti-Procrastinación', requirement: 14, type: 'airplane_mode' },
+            { id: 159, name: 'Equilibrista', desc: 'Múltiples proyectos avanzando', icon: '🎪', category: 'Anti-Procrastinación', requirement: 1, type: 'multiple_projects' },
+            { id: 160, name: 'Sprint', desc: 'Técnica pomodoro por 30 días', icon: '🏃', category: 'Anti-Procrastinación', requirement: 30, type: 'pomodoro_streak' },
+            { id: 161, name: 'Anti-Pereza', desc: 'Vence la procrastinación 30 días', icon: '🦸', category: 'Anti-Procrastinación', requirement: 30, type: 'anti_laziness' }
+        ];
+
+        // Game State
         let gameState = {
             user: {
                 name: 'Héroe',
@@ -2405,7 +2932,11 @@
                 settings: {
                     notifications: true,
                     sounds: true
-                }
+                },
+                lastLogin: null,
+                currentStreak: 0,
+                longestStreak: 0,
+                lastResetDate: null
             },
             party: {
                 code: 'XP7-9Q2',
@@ -2428,17 +2959,17 @@
             },
             quests: {
                 health: [
-                    { id: 1, title: 'Beber 2L de agua', difficulty: 2, completed: false, streak: 3, xp: 20, gold: 5 },
-                    { id: 2, title: 'Ejercicio 30 minutos', difficulty: 3, completed: false, streak: 5, xp: 35, gold: 10 }
+                    { id: 1, title: 'Beber 2L de agua', difficulty: 2, completed: false, streak: 3, xp: 20, gold: 5, lastCompleted: null },
+                    { id: 2, title: 'Ejercicio 30 minutos', difficulty: 3, completed: false, streak: 5, xp: 35, gold: 10, lastCompleted: null }
                 ],
                 work: [
-                    { id: 3, title: 'Deep Work 2 horas', difficulty: 3, completed: false, streak: 2, xp: 40, gold: 12 }
+                    { id: 3, title: 'Deep Work 2 horas', difficulty: 3, completed: false, streak: 2, xp: 40, gold: 12, lastCompleted: null }
                 ],
                 mind: [
-                    { id: 4, title: 'Meditar 10 minutos', difficulty: 2, completed: true, streak: 7, xp: 25, gold: 6 }
+                    { id: 4, title: 'Meditar 10 minutos', difficulty: 2, completed: false, streak: 7, xp: 25, gold: 6, lastCompleted: null }
                 ],
                 social: [
-                    { id: 5, title: 'Llamar a un familiar', difficulty: 2, completed: false, streak: 1, xp: 30, gold: 8 }
+                    { id: 5, title: 'Llamar a un familiar', difficulty: 2, completed: false, streak: 1, xp: 30, gold: 8, lastCompleted: null }
                 ]
             },
             shop: [
@@ -2449,44 +2980,128 @@
                 { id: 5, name: 'Día de Spa', icon: '🛁', cost: 150, desc: 'Baño relajante + skincare' },
                 { id: 6, name: 'Café Especial', icon: '☕', cost: 30, desc: 'Tomar café en cafetería' }
             ],
-            achievements: [
-                { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', unlocked: false },
-                { id: 2, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', unlocked: false },
-                { id: 3, name: 'Cazador de Logros', desc: 'Desbloquea 5 logros', icon: '🏆', unlocked: false },
-                { id: 4, name: 'Millonario', desc: 'Acumula 500 de oro', icon: '💰', unlocked: false },
-                { id: 5, name: 'Veterano', desc: 'Alcanza nivel 10', icon: '🎖️', unlocked: false }
-            ],
-            notifications: [
-                { id: 1, title: '¡Bienvenido!', text: 'Comienza tu aventura completando misiones', icon: '🎉', unread: true, time: 'Ahora' },
-                { id: 2, title: 'Racha en riesgo', text: 'Completa una misión hoy para mantener tu racha', icon: '⚠️', unread: true, time: 'Hace 2h' }
-            ]
+            achievements: JSON.parse(JSON.stringify(achievementsDB)),
+            notifications: [],
+            stats: {
+                questsByCategory: { health: 0, work: 0, mind: 0, social: 0 },
+                totalQuestsCreated: 5,
+                perfectDays: 0,
+                currentPerfectDayStreak: 0
+            }
         };
 
         let selectedDifficulty = 2;
+        let editDifficulty = 2;
         let tempAvatar = '🧙‍♂️';
         let isFirstTime = false;
+        let currentEditingQuest = null;
+        let confirmCallback = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadGame();
+            checkDailyReset();
             checkFirstTime();
             renderAll();
             updateStats();
             setupChatInput();
             requestNotificationPermission();
             setInterval(checkReminders, 60000);
+            setInterval(checkDailyReset, 60000); // Check every minute for reset
         });
+
+        // Daily Reset System
+        function checkDailyReset() {
+            const now = new Date();
+            const lastReset = gameState.user.lastResetDate ? new Date(gameState.user.lastResetDate) : null;
+            
+            // Check if it's past 5:00 AM and we haven't reset today
+            const today5AM = new Date(now);
+            today5AM.setHours(5, 0, 0, 0);
+            
+            if (!lastReset || lastReset < today5AM && now >= today5AM) {
+                performDailyReset();
+            }
+        }
+
+        function performDailyReset() {
+            const now = new Date();
+            gameState.user.lastResetDate = now.toISOString();
+            
+            // Check if all quests were completed yesterday for streak
+            const allCompleted = Object.values(gameState.quests).every(cat => 
+                cat.every(q => q.completed)
+            );
+            
+            if (allCompleted) {
+                gameState.user.currentStreak++;
+                if (gameState.user.currentStreak > gameState.user.longestStreak) {
+                    gameState.user.longestStreak = gameState.user.currentStreak;
+                }
+                gameState.stats.currentPerfectDayStreak++;
+                if (gameState.stats.currentPerfectDayStreak > gameState.stats.perfectDays) {
+                    gameState.stats.perfectDays = gameState.stats.currentPerfectDayStreak;
+                }
+                addNotification('🔥 Racha Continuada', `¡Llevas ${gameState.user.currentStreak} días perfectos!`, '🔥');
+            } else {
+                if (gameState.user.currentStreak > 0) {
+                    addNotification('💔 Racha Perdida', `Tu racha de ${gameState.user.currentStreak} días se ha reiniciado`, '💔');
+                }
+                gameState.user.currentStreak = 0;
+                gameState.stats.currentPerfectDayStreak = 0;
+            }
+            
+            // Reset all quests
+            Object.keys(gameState.quests).forEach(category => {
+                gameState.quests[category].forEach(quest => {
+                    if (quest.completed) {
+                        quest.streak++;
+                    } else {
+                        quest.streak = 0;
+                    }
+                    quest.completed = false;
+                    quest.lastCompleted = null;
+                });
+            });
+            
+            addNotification('🌅 Nuevo Día', 'Todas las misiones han sido reiniciadas. ¡Buena suerte!', '🌅');
+            saveGame();
+            renderQuests();
+            updateStats();
+            showToast('🌅', 'Nuevo Día', 'Las misiones han sido reiniciadas');
+        }
+
+        // Confirmation Dialog System
+        function showConfirmDialog(title, text, icon, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-text').textContent = text;
+            document.getElementById('confirm-icon').textContent = icon;
+            confirmCallback = callback;
+            document.getElementById('confirm-dialog').classList.add('active');
+        }
+
+        function closeConfirmDialog() {
+            document.getElementById('confirm-dialog').classList.remove('active');
+            confirmCallback = null;
+        }
+
+        function executeConfirmAction() {
+            if (confirmCallback) {
+                confirmCallback();
+                closeConfirmDialog();
+            }
+        }
 
         // Load and Save
         function loadGame() {
             const saved = localStorage.getItem('lifequest_data_v2');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // Merge saved data with defaults to ensure all fields exist
                 gameState = { ...gameState, ...parsed };
                 if (parsed.user) gameState.user = { ...gameState.user, ...parsed.user };
                 if (parsed.achievements) gameState.achievements = parsed.achievements;
                 if (parsed.notifications) gameState.notifications = parsed.notifications;
+                if (parsed.stats) gameState.stats = { ...gameState.stats, ...parsed.stats };
                 tempAvatar = gameState.user.avatar;
             }
         }
@@ -2570,7 +3185,7 @@
             }
         }
 
-        // Sound effects (simple beep)
+        // Sound effects
         function playSound(type) {
             if (!gameState.user.settings.sounds) return;
             
@@ -2616,9 +3231,13 @@
                 document.getElementById(`${cat}-progress`).textContent = `${completed}/${quests.length} completadas`;
                 
                 container.innerHTML = quests.map(quest => `
-                    <div class="quest-item ${quest.completed ? 'completed' : ''}" onclick="toggleQuest('${cat}', ${quest.id})">
-                        <div class="quest-checkbox">${quest.completed ? '✓' : ''}</div>
-                        <div class="quest-content">
+                    <div class="quest-item ${quest.completed ? 'completed' : ''} ${quest.resetting ? 'resetting' : ''}" 
+                         ondblclick="openQuestEditModal('${cat}', ${quest.id})"
+                         title="Doble clic para editar">
+                        <div class="quest-checkbox" onclick="event.stopPropagation(); toggleQuest('${cat}', ${quest.id})">
+                            ${quest.completed ? '✓' : ''}
+                        </div>
+                        <div class="quest-content" onclick="toggleQuest('${cat}', ${quest.id})">
                             <div class="quest-title">${quest.title}</div>
                             <div class="quest-meta">
                                 <span class="streak-badge">🔥 ${quest.streak}</span>
@@ -2627,9 +3246,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="quest-reward">
+                        <div class="quest-reward" onclick="toggleQuest('${cat}', ${quest.id})">
                             <div class="xp-reward">+${quest.xp}</div>
                             <div class="gold-reward">${quest.gold} 🪙</div>
+                        </div>
+                        <div class="quest-actions" onclick="event.stopPropagation()">
+                            <button class="quest-btn edit" onclick="openQuestEditModal('${cat}', ${quest.id})" title="Editar">✏️</button>
+                            <button class="quest-btn delete" onclick="confirmDeleteQuestDirect('${cat}', ${quest.id})" title="Eliminar">🗑️</button>
                         </div>
                     </div>
                 `).join('');
@@ -2643,11 +3266,13 @@
             quest.completed = !quest.completed;
             
             if (quest.completed) {
+                const now = new Date();
+                quest.lastCompleted = now.toISOString();
                 gameState.user.xp += quest.xp;
                 gameState.user.gold += quest.gold;
                 gameState.user.totalCompleted++;
                 gameState.user.totalXp += quest.xp;
-                quest.streak++;
+                gameState.stats.questsByCategory[category]++;
                 
                 playSound('complete');
                 damageBoss(quest.xp);
@@ -2660,12 +3285,108 @@
                 gameState.user.gold = Math.max(0, gameState.user.gold - quest.gold);
                 gameState.user.totalCompleted--;
                 gameState.user.totalXp -= quest.xp;
-                quest.streak--;
+                gameState.stats.questsByCategory[category]--;
             }
             
             saveGame();
             renderAll();
             updateStats();
+        }
+
+        // Quest Edit/Delete Functions
+        function openQuestEditModal(category, questId) {
+            const quest = gameState.quests[category].find(q => q.id === questId);
+            if (!quest) return;
+            
+            currentEditingQuest = { category, questId };
+            document.getElementById('edit-quest-id').value = questId;
+            document.getElementById('edit-quest-category').value = category;
+            document.getElementById('edit-quest-name').value = quest.title;
+            document.getElementById('edit-quest-category-select').value = category;
+            
+            // Set difficulty
+            editDifficulty = quest.difficulty;
+            document.querySelectorAll('[data-edit-diff]').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.editDiff) === quest.difficulty);
+            });
+            
+            document.getElementById('quest-edit-modal').classList.add('active');
+        }
+
+        function closeQuestEditModal() {
+            document.getElementById('quest-edit-modal').classList.remove('active');
+            currentEditingQuest = null;
+        }
+
+        function setEditDiff(d) {
+            editDifficulty = d;
+            document.querySelectorAll('[data-edit-diff]').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.editDiff) === d);
+            });
+        }
+
+        function saveQuestEdit(e) {
+            e.preventDefault();
+            if (!currentEditingQuest) return;
+            
+            const { category, questId } = currentEditingQuest;
+            const quest = gameState.quests[category].find(q => q.id === questId);
+            if (!quest) return;
+            
+            const newTitle = document.getElementById('edit-quest-name').value.trim();
+            const newCategory = document.getElementById('edit-quest-category-select').value;
+            
+            if (!newTitle) {
+                showToast('⚠️', 'Error', 'El nombre no puede estar vacío');
+                return;
+            }
+            
+            // Update quest
+            quest.title = newTitle;
+            quest.difficulty = editDifficulty;
+            quest.xp = editDifficulty * 15;
+            quest.gold = editDifficulty * 5;
+            
+            // Move to different category if changed
+            if (newCategory !== category) {
+                const questIndex = gameState.quests[category].findIndex(q => q.id === questId);
+                if (questIndex > -1) {
+                    const [movedQuest] = gameState.quests[category].splice(questIndex, 1);
+                    gameState.quests[newCategory].push(movedQuest);
+                }
+            }
+            
+            saveGame();
+            renderQuests();
+            closeQuestEditModal();
+            showToast('✅', 'Misión Actualizada', 'Los cambios se guardaron');
+        }
+
+        function confirmDeleteQuest() {
+            if (!currentEditingQuest) return;
+            const { category, questId } = currentEditingQuest;
+            confirmDeleteQuestDirect(category, questId);
+            closeQuestEditModal();
+        }
+
+        function confirmDeleteQuestDirect(category, questId) {
+            const quest = gameState.quests[category].find(q => q.id === questId);
+            if (!quest) return;
+            
+            showConfirmDialog(
+                '¿Eliminar misión?',
+                `¿Estás seguro de que quieres eliminar "${quest.title}"? Esta acción no se puede deshacer.`,
+                '🗑️',
+                () => {
+                    const questIndex = gameState.quests[category].findIndex(q => q.id === questId);
+                    if (questIndex > -1) {
+                        gameState.quests[category].splice(questIndex, 1);
+                        saveGame();
+                        renderQuests();
+                        showToast('🗑️', 'Misión Eliminada', 'La misión ha sido eliminada');
+                    }
+                }
+            );
         }
 
         function damageBoss(amount) {
@@ -2690,8 +3411,6 @@
             gameState.party.boss.maxHp = Math.floor(gameState.party.boss.maxHp * 1.2);
             
             addChatMessage('Sistema', '🤖', `¡${gameState.party.boss.name} ha sido derrotado!`, true);
-            
-            // Add notification
             addNotification('¡Jefe Derrotado!', 'Tu party derrotó al jefe semanal', '🎉');
             
             checkLevelUp();
@@ -2714,8 +3433,6 @@
                 
                 playSound('levelup');
                 showLevelUp(gameState.user.level);
-                
-                // Add notification for level up
                 addNotification('¡Subiste de Nivel!', `Ahora eres nivel ${gameState.user.level}`, '⭐');
             }
             updateUI();
@@ -2735,42 +3452,59 @@
             const newUnlocks = [];
             const now = new Date().toLocaleDateString();
             
-            if (gameState.user.totalCompleted >= 1 && !gameState.achievements[0].unlocked) {
-                gameState.achievements[0].unlocked = true;
-                gameState.achievements[0].unlockedDate = now;
-                newUnlocks.push(gameState.achievements[0]);
-            }
-            
-            const maxStreak = Math.max(...Object.values(gameState.quests).flat().map(q => q.streak));
-            if (maxStreak >= 7 && !gameState.achievements[1].unlocked) {
-                gameState.achievements[1].unlocked = true;
-                gameState.achievements[1].unlockedDate = now;
-                newUnlocks.push(gameState.achievements[1]);
-            }
-            
-            if (gameState.user.gold >= 500 && !gameState.achievements[3].unlocked) {
-                gameState.achievements[3].unlocked = true;
-                gameState.achievements[3].unlockedDate = now;
-                newUnlocks.push(gameState.achievements[3]);
-            }
-            
-            if (gameState.user.level >= 10 && !gameState.achievements[4].unlocked) {
-                gameState.achievements[4].unlocked = true;
-                gameState.achievements[4].unlockedDate = now;
-                newUnlocks.push(gameState.achievements[4]);
-            }
-
-            // Check Cazador de Logros
-            const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
-            if (unlockedCount >= 5 && !gameState.achievements[2].unlocked) {
-                gameState.achievements[2].unlocked = true;
-                gameState.achievements[2].unlockedDate = now;
-                newUnlocks.push(gameState.achievements[2]);
-            }
+            gameState.achievements.forEach(ach => {
+                if (ach.unlocked) return;
+                
+                let shouldUnlock = false;
+                
+                switch(ach.type) {
+                    case 'quests_completed':
+                        shouldUnlock = gameState.user.totalCompleted >= ach.requirement;
+                        break;
+                    case 'level':
+                        shouldUnlock = gameState.user.level >= ach.requirement;
+                        break;
+                    case 'daily_streak':
+                        shouldUnlock = gameState.user.currentStreak >= ach.requirement;
+                        break;
+                    case 'gold_1000':
+                    case 'gold_5000':
+                    case 'gold_10000':
+                        shouldUnlock = gameState.user.gold >= ach.requirement;
+                        break;
+                    case 'achievements_count':
+                        const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
+                        shouldUnlock = unlockedCount >= ach.requirement;
+                        break;
+                    case 'shop_buy':
+                        // Check if any shop item was bought (track in stats)
+                        shouldUnlock = gameState.stats.shopBuys >= ach.requirement;
+                        break;
+                    case 'profile_edit':
+                        shouldUnlock = gameState.stats.profileEdits >= ach.requirement;
+                        break;
+                    case 'login_streak':
+                        shouldUnlock = gameState.user.loginStreak >= ach.requirement;
+                        break;
+                    case 'boss_defeat':
+                    case 'boss_defeat_count':
+                        shouldUnlock = gameState.stats.bossesDefeated >= ach.requirement;
+                        break;
+                    case 'perfect_days':
+                        shouldUnlock = gameState.stats.perfectDays >= ach.requirement;
+                        break;
+                }
+                
+                if (shouldUnlock) {
+                    ach.unlocked = true;
+                    ach.unlockedDate = now;
+                    newUnlocks.push(ach);
+                }
+            });
             
             newUnlocks.forEach(ach => {
-                showToast('🏆', '¡Logro Desbloqueado!', ach.name);
-                addNotification('¡Logro Desbloqueado!', `Has desbloqueado: ${ach.name}`, '🏆');
+                showToast('🏆', '¡Logro Desbloqueado!', `${ach.name}: ${ach.desc}`);
+                addNotification('¡Logro Desbloqueado!', `Has desbloqueado: ${ach.name}`, ach.icon);
             });
 
             if (newUnlocks.length > 0) {
@@ -2781,18 +3515,27 @@
         }
 
         function renderAchievements() {
-            // Render in stats section
+            // Render in stats section (recent only)
             const container = document.getElementById('achievements-list');
             if (container) {
-                container.innerHTML = gameState.achievements.map(ach => `
-                    <div class="achievement-item ${ach.unlocked ? 'unlocked' : ''}">
-                        <div class="achievement-icon">${ach.icon}</div>
-                        <div class="achievement-info">
-                            <div class="achievement-name">${ach.name}</div>
-                            <div class="achievement-desc">${ach.desc}</div>
+                const recentAchievements = gameState.achievements
+                    .filter(a => a.unlocked)
+                    .slice(-5)
+                    .reverse();
+                
+                if (recentAchievements.length === 0) {
+                    container.innerHTML = '<p style="color: #64748b; text-align: center;">Completa misiones para desbloquear logros</p>';
+                } else {
+                    container.innerHTML = recentAchievements.map(ach => `
+                        <div class="achievement-item unlocked">
+                            <div class="achievement-icon">${ach.icon}</div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">${ach.name}</div>
+                                <div class="achievement-desc">${ach.desc}</div>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
             }
 
             // Render detail view
@@ -2801,7 +3544,8 @@
 
         function renderAchievementsDetail() {
             const container = document.getElementById('achievements-detail-list');
-            if (!container) return;
+            const categoriesContainer = document.getElementById('achievements-categories');
+            if (!container || !categoriesContainer) return;
 
             const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
             const totalCount = gameState.achievements.length;
@@ -2813,7 +3557,37 @@
             if (progressBar) progressBar.style.width = progressPercent + '%';
             if (progressText) progressText.textContent = `${unlockedCount} de ${totalCount} logros desbloqueados`;
 
-            container.innerHTML = gameState.achievements.map(ach => `
+            // Get unique categories
+            const categories = [...new Set(gameState.achievements.map(a => a.category))];
+            
+            // Render category buttons
+            categoriesContainer.innerHTML = categories.map(cat => {
+                const catAchievements = gameState.achievements.filter(a => a.category === cat);
+                const catUnlocked = catAchievements.filter(a => a.unlocked).length;
+                return `
+                    <button class="achievement-category-btn" onclick="filterAchievements('${cat}')">
+                        ${cat} (${catUnlocked}/${catAchievements.length})
+                    </button>
+                `;
+            }).join('');
+
+            // Render achievements
+            renderAchievementsList(gameState.achievements);
+        }
+
+        function filterAchievements(category) {
+            const filtered = gameState.achievements.filter(a => a.category === category);
+            renderAchievementsList(filtered);
+            
+            // Update active button
+            document.querySelectorAll('.achievement-category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(category));
+            });
+        }
+
+        function renderAchievementsList(achievements) {
+            const container = document.getElementById('achievements-detail-list');
+            container.innerHTML = achievements.map(ach => `
                 <div class="achievement-detail-card ${ach.unlocked ? 'unlocked' : 'locked'}">
                     <div class="achievement-detail-icon">${ach.icon}</div>
                     <div class="achievement-detail-info">
@@ -2822,6 +3596,11 @@
                         <div class="achievement-detail-date">
                             ${ach.unlocked ? `✓ Desbloqueado el ${ach.unlockedDate || 'Recientemente'}` : '🔒 Bloqueado'}
                         </div>
+                        ${!ach.unlocked ? `
+                            <div class="achievement-progress-mini">
+                                <div class="achievement-progress-mini-fill" style="width: ${Math.min(100, (ach.progress || 0) / ach.requirement * 100)}%"></div>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -2914,8 +3693,10 @@
             const item = gameState.shop.find(i => i.id === id);
             if (gameState.user.gold >= item.cost) {
                 gameState.user.gold -= item.cost;
+                gameState.stats.shopBuys = (gameState.stats.shopBuys || 0) + 1;
                 showToast('🎁', 'Recompensa Comprada', `Disfruta: ${item.name}`);
                 addNotification('Compra Exitosa', `Has comprado: ${item.name}`, '🛒');
+                checkAchievements();
                 saveGame();
                 updateStats();
                 renderShop();
@@ -2933,7 +3714,7 @@
                 time: 'Ahora'
             };
             gameState.notifications.unshift(newNotif);
-            if (gameState.notifications.length > 20) gameState.notifications.pop();
+            if (gameState.notifications.length > 50) gameState.notifications.pop();
             saveGame();
             renderNotifications();
             updateNotificationBadge();
@@ -2990,11 +3771,17 @@
         }
 
         function clearAllNotifications() {
-            if (confirm('¿Eliminar todas las notificaciones?')) {
-                gameState.notifications = [];
-                saveGame();
-                renderNotifications();
-            }
+            showConfirmDialog(
+                '¿Limpiar notificaciones?',
+                '¿Estás seguro de que quieres eliminar todas las notificaciones?',
+                '🗑️',
+                () => {
+                    gameState.notifications = [];
+                    saveGame();
+                    renderNotifications();
+                    showToast('🗑️', 'Notificaciones', 'Todas las notificaciones han sido eliminadas');
+                }
+            );
         }
 
         function updateNotificationBadge() {
@@ -3014,7 +3801,7 @@
             document.getElementById('xp-bar').style.width = (gameState.user.xp/gameState.user.xpToNext*100) + '%';
             
             document.getElementById('total-completed').textContent = gameState.user.totalCompleted;
-            document.getElementById('max-streak').textContent = Math.max(...Object.values(gameState.quests).flat().map(q => q.streak));
+            document.getElementById('max-streak').textContent = gameState.user.longestStreak;
             document.getElementById('current-level').textContent = gameState.user.level;
             document.getElementById('total-xp').textContent = gameState.user.totalXp;
         }
@@ -3022,17 +3809,15 @@
         function updateStats() {
             document.getElementById('stat-xp').textContent = gameState.user.xp;
             document.getElementById('stat-gold').textContent = gameState.user.gold;
-            document.getElementById('stat-streak').textContent = gameState.user.streak;
+            document.getElementById('stat-streak').textContent = gameState.user.currentStreak;
             document.getElementById('stat-hp').textContent = gameState.user.hp;
         }
 
         function showSection(section) {
-            // Hide all sections
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            // Map sections to tab indices
             const sectionMap = {
                 'quests': 0,
                 'party': 1,
@@ -3040,24 +3825,18 @@
                 'profile': 3
             };
 
-            // Show selected section
-            const targetSection = document.getElementById(`${section}-section`);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-            
-            // Handle special sections
             if (section === 'stats') {
                 document.getElementById('stats-section').classList.add('active');
                 document.querySelectorAll('.tab')[3].classList.add('active');
             } else if (section === 'achievements-detail') {
                 document.getElementById('achievements-detail-section').classList.add('active');
                 document.querySelectorAll('.tab')[3].classList.add('active');
-                renderAchievementsDetail(); // Force re-render
+                renderAchievementsDetail();
             } else if (section === 'notifications') {
                 document.getElementById('notifications-section').classList.add('active');
-                renderNotifications(); // Force re-render
+                renderNotifications();
             } else if (sectionMap[section] !== undefined) {
+                document.getElementById(`${section}-section`).classList.add('active');
                 document.querySelectorAll('.tab')[sectionMap[section]].classList.add('active');
                 document.querySelectorAll('.nav-item')[sectionMap[section]].classList.add('active');
             }
@@ -3091,16 +3870,18 @@
                 completed: false,
                 streak: 0,
                 xp: selectedDifficulty * 15,
-                gold: selectedDifficulty * 5
+                gold: selectedDifficulty * 5,
+                lastCompleted: null
             };
             
             gameState.quests[cat].push(newQuest);
+            gameState.stats.totalQuestsCreated++;
             saveGame();
             renderQuests();
             closeModal();
             showToast('⚔️', 'Misión Creada', '¡Nueva aventura comienza!');
             addNotification('Nueva Misión', `Has creado: ${name}`, '⚔️');
-            document.querySelector('form').reset();
+            document.getElementById('quest-name').value = '';
         }
 
         function shareParty() {
@@ -3150,6 +3931,10 @@
 
         document.getElementById('profile-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeProfileModal();
+        });
+
+        document.getElementById('quest-edit-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeQuestEditModal();
         });
 
         // PROFILE FUNCTIONS
@@ -3237,6 +4022,8 @@
                 gameState.user.joinDate = new Date().toLocaleDateString();
             }
             
+            gameState.stats.profileEdits = (gameState.stats.profileEdits || 0) + 1;
+            
             const profileData = {
                 name: gameState.user.name,
                 email: gameState.user.email,
@@ -3250,6 +4037,7 @@
             updateProfileDisplay();
             updateUI();
             closeProfileEditModal();
+            checkAchievements();
             
             if (isFirstTime) {
                 isFirstTime = false;
@@ -3273,13 +4061,16 @@
             
             const grid = document.getElementById('profile-achievements-grid');
             const unlockedAchievements = gameState.achievements.filter(a => a.unlocked).slice(-4);
-            grid.innerHTML = unlockedAchievements.map(a => `
-                <div class="achievement-preview unlocked">${a.icon}</div>
-            `).join('');
             
-            const emptySlots = 4 - unlockedAchievements.length;
-            for (let i = 0; i < emptySlots; i++) {
-                grid.innerHTML += `<div class="achievement-preview">🔒</div>`;
+            if (grid) {
+                grid.innerHTML = unlockedAchievements.map(a => `
+                    <div class="achievement-preview unlocked">${a.icon}</div>
+                `).join('');
+                
+                const emptySlots = 4 - unlockedAchievements.length;
+                for (let i = 0; i < emptySlots; i++) {
+                    grid.innerHTML += `<div class="achievement-preview">🔒</div>`;
+                }
             }
         }
 
@@ -3304,14 +4095,24 @@
             showToast('💾', 'Datos Exportados', 'Backup descargado correctamente');
         }
 
-        function resetData() {
-            if (confirm('⚠️ ¿Estás seguro? Se borrarán TODOS tus datos permanentemente.')) {
-                if (confirm('¿De verdad? Esta acción no se puede deshacer.')) {
-                    localStorage.removeItem('lifequest_data_v2');
-                    localStorage.removeItem('lifequest_profile');
-                    location.reload();
+        function confirmResetData() {
+            showConfirmDialog(
+                '¿Reiniciar todo?',
+                '¿Estás seguro de que quieres borrar TODOS tus datos? Esta acción no se puede deshacer.',
+                '⚠️',
+                () => {
+                    showConfirmDialog(
+                        '¿De verdad?',
+                        'Esta es tu última oportunidad. ¿Deseas continuar?',
+                        '🗑️',
+                        () => {
+                            localStorage.removeItem('lifequest_data_v2');
+                            localStorage.removeItem('lifequest_profile');
+                            location.reload();
+                        }
+                    );
                 }
-            }
+            );
         }
 
         // Close profile modal on outside click

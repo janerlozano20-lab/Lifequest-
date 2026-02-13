@@ -1799,6 +1799,108 @@
             background: rgba(99, 102, 241, 0.2);
             border-color: var(--primary);
         }
+
+        /* NOTIFICATIONS SECTION */
+        .notifications-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .notifications-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+        }
+
+        .notification-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+
+        .notification-item.unread {
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            font-size: 0.95rem;
+        }
+
+        .notification-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.3rem;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .clear-all-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -1808,7 +1910,7 @@
         <div class="header-top">
             <div class="logo">LifeQuest</div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="showNotifications()" title="Notificaciones">
+                <button class="icon-btn" onclick="showSection('notifications')" title="Notificaciones">
                     🔔
                     <span class="badge" id="notif-badge">2</span>
                 </button>
@@ -2100,7 +2202,7 @@
             <div class="menu-item" onclick="showSection('achievements-detail')">
                 <span class="menu-icon">🏆</span>
                 <span class="menu-text">Logros Desbloqueados</span>
-                <span class="menu-badge" id="achievements-count">2</span>
+                <span class="menu-badge" id="achievements-count">0</span>
             </div>
             <div class="menu-item" onclick="exportData()">
                 <span class="menu-icon">💾</span>
@@ -2129,12 +2231,32 @@
             <h2 class="achievements-detail-title">🏆 Logros Desbloqueados</h2>
             <p style="color: #94a3b8; font-size: 0.9rem;">Colecciona todos los logros completando misiones</p>
             <div class="achievements-progress">
-                <div class="achievements-progress-fill" id="achievements-progress-bar" style="width: 40%"></div>
+                <div class="achievements-progress-fill" id="achievements-progress-bar" style="width: 0%"></div>
             </div>
-            <div class="achievements-count-text" id="achievements-progress-text">2 de 5 logros desbloqueados</div>
+            <div class="achievements-count-text" id="achievements-progress-text">0 de 5 logros desbloqueados</div>
         </div>
 
-        <div id="achievements-detail-list"></div>
+        <div id="achievements-detail-list">
+            <!-- Los logros se renderizarán aquí -->
+        </div>
+    </section>
+
+    <!-- NOTIFICATIONS SECTION -->
+    <section id="notifications-section" class="section">
+        <div class="notifications-header">
+            <button class="back-btn" onclick="showSection('quests')" style="margin: 0; padding: 0.5rem 1rem;">
+                <span>←</span>
+            </button>
+            <h2>🔔 Notificaciones</h2>
+        </div>
+        
+        <button class="clear-all-btn" onclick="clearAllNotifications()" id="clear-all-btn" style="display: none;">
+            🗑️ Limpiar todo
+        </button>
+
+        <div id="notifications-list">
+            <!-- Las notificaciones se renderizarán aquí -->
+        </div>
     </section>
 
     <button class="fab" onclick="openModal()">+</button>
@@ -2267,7 +2389,7 @@
         const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟', '🦁', '🐉', '👑', '🦸', '🧝‍♀️', '🧛', '🤖', '👽'];
 
         // Game State with settings
-        const gameState = {
+        let gameState = {
             user: {
                 name: 'Héroe',
                 level: 1,
@@ -2328,11 +2450,15 @@
                 { id: 6, name: 'Café Especial', icon: '☕', cost: 30, desc: 'Tomar café en cafetería' }
             ],
             achievements: [
-                { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', unlocked: true, unlockedDate: '2024-01-15' },
-                { id: 2, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', unlocked: true, unlockedDate: '2024-01-20' },
+                { id: 1, name: 'Primeros Pasos', desc: 'Completa tu primera misión', icon: '👶', unlocked: false },
+                { id: 2, name: 'Racha de Fuego', desc: '7 días seguidos completando', icon: '🔥', unlocked: false },
                 { id: 3, name: 'Cazador de Logros', desc: 'Desbloquea 5 logros', icon: '🏆', unlocked: false },
                 { id: 4, name: 'Millonario', desc: 'Acumula 500 de oro', icon: '💰', unlocked: false },
                 { id: 5, name: 'Veterano', desc: 'Alcanza nivel 10', icon: '🎖️', unlocked: false }
+            ],
+            notifications: [
+                { id: 1, title: '¡Bienvenido!', text: 'Comienza tu aventura completando misiones', icon: '🎉', unread: true, time: 'Ahora' },
+                { id: 2, title: 'Racha en riesgo', text: 'Completa una misión hoy para mantener tu racha', icon: '⚠️', unread: true, time: 'Hace 2h' }
             ]
         };
 
@@ -2348,7 +2474,7 @@
             updateStats();
             setupChatInput();
             requestNotificationPermission();
-            setInterval(checkReminders, 60000); // Check every minute
+            setInterval(checkReminders, 60000);
         });
 
         // Load and Save
@@ -2356,7 +2482,11 @@
             const saved = localStorage.getItem('lifequest_data_v2');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                Object.assign(gameState, parsed);
+                // Merge saved data with defaults to ensure all fields exist
+                gameState = { ...gameState, ...parsed };
+                if (parsed.user) gameState.user = { ...gameState.user, ...parsed.user };
+                if (parsed.achievements) gameState.achievements = parsed.achievements;
+                if (parsed.notifications) gameState.notifications = parsed.notifications;
                 tempAvatar = gameState.user.avatar;
             }
         }
@@ -2471,6 +2601,7 @@
             renderShop();
             renderAchievements();
             renderChat();
+            renderNotifications();
             updateUI();
         }
 
@@ -2560,6 +2691,9 @@
             
             addChatMessage('Sistema', '🤖', `¡${gameState.party.boss.name} ha sido derrotado!`, true);
             
+            // Add notification
+            addNotification('¡Jefe Derrotado!', 'Tu party derrotó al jefe semanal', '🎉');
+            
             checkLevelUp();
         }
 
@@ -2580,6 +2714,9 @@
                 
                 playSound('levelup');
                 showLevelUp(gameState.user.level);
+                
+                // Add notification for level up
+                addNotification('¡Subiste de Nivel!', `Ahora eres nivel ${gameState.user.level}`, '⭐');
             }
             updateUI();
         }
@@ -2633,9 +2770,11 @@
             
             newUnlocks.forEach(ach => {
                 showToast('🏆', '¡Logro Desbloqueado!', ach.name);
+                addNotification('¡Logro Desbloqueado!', `Has desbloqueado: ${ach.name}`, '🏆');
             });
 
             if (newUnlocks.length > 0) {
+                saveGame();
                 renderAchievements();
                 updateProfileDisplay();
             }
@@ -2668,9 +2807,11 @@
             const totalCount = gameState.achievements.length;
             const progressPercent = (unlockedCount / totalCount) * 100;
 
-            document.getElementById('achievements-progress-bar').style.width = progressPercent + '%';
-            document.getElementById('achievements-progress-text').textContent = 
-                `${unlockedCount} de ${totalCount} logros desbloqueados`;
+            const progressBar = document.getElementById('achievements-progress-bar');
+            const progressText = document.getElementById('achievements-progress-text');
+            
+            if (progressBar) progressBar.style.width = progressPercent + '%';
+            if (progressText) progressText.textContent = `${unlockedCount} de ${totalCount} logros desbloqueados`;
 
             container.innerHTML = gameState.achievements.map(ach => `
                 <div class="achievement-detail-card ${ach.unlocked ? 'unlocked' : 'locked'}">
@@ -2774,9 +2915,94 @@
             if (gameState.user.gold >= item.cost) {
                 gameState.user.gold -= item.cost;
                 showToast('🎁', 'Recompensa Comprada', `Disfruta: ${item.name}`);
+                addNotification('Compra Exitosa', `Has comprado: ${item.name}`, '🛒');
                 saveGame();
                 updateStats();
                 renderShop();
+            }
+        }
+
+        // Notifications System
+        function addNotification(title, text, icon = '🔔') {
+            const newNotif = {
+                id: Date.now(),
+                title: title,
+                text: text,
+                icon: icon,
+                unread: true,
+                time: 'Ahora'
+            };
+            gameState.notifications.unshift(newNotif);
+            if (gameState.notifications.length > 20) gameState.notifications.pop();
+            saveGame();
+            renderNotifications();
+            updateNotificationBadge();
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notifications-list');
+            const clearBtn = document.getElementById('clear-all-btn');
+            const badge = document.getElementById('notif-badge');
+            
+            if (!container) return;
+            
+            // Update badge
+            const unreadCount = gameState.notifications.filter(n => n.unread).length;
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+            
+            // Show/hide clear button
+            if (clearBtn) {
+                clearBtn.style.display = gameState.notifications.length > 0 ? 'block' : 'none';
+            }
+            
+            if (gameState.notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔔</div>
+                        <div class="empty-state-text">No tienes notificaciones</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = gameState.notifications.map(notif => `
+                <div class="notification-item ${notif.unread ? 'unread' : ''}" onclick="markNotificationRead(${notif.id})">
+                    <div class="notification-icon">${notif.icon}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-text">${notif.text}</div>
+                        <div class="notification-time">${notif.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function markNotificationRead(id) {
+            const notif = gameState.notifications.find(n => n.id === id);
+            if (notif) {
+                notif.unread = false;
+                saveGame();
+                renderNotifications();
+            }
+        }
+
+        function clearAllNotifications() {
+            if (confirm('¿Eliminar todas las notificaciones?')) {
+                gameState.notifications = [];
+                saveGame();
+                renderNotifications();
+            }
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notif-badge');
+            const unreadCount = gameState.notifications.filter(n => n.unread).length;
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'flex' : 'none';
             }
         }
 
@@ -2801,10 +3027,12 @@
         }
 
         function showSection(section) {
+            // Hide all sections
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
+            // Map sections to tab indices
             const sectionMap = {
                 'quests': 0,
                 'party': 1,
@@ -2812,15 +3040,24 @@
                 'profile': 3
             };
 
+            // Show selected section
+            const targetSection = document.getElementById(`${section}-section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Handle special sections
             if (section === 'stats') {
                 document.getElementById('stats-section').classList.add('active');
                 document.querySelectorAll('.tab')[3].classList.add('active');
             } else if (section === 'achievements-detail') {
                 document.getElementById('achievements-detail-section').classList.add('active');
                 document.querySelectorAll('.tab')[3].classList.add('active');
-                renderAchievementsDetail();
+                renderAchievementsDetail(); // Force re-render
+            } else if (section === 'notifications') {
+                document.getElementById('notifications-section').classList.add('active');
+                renderNotifications(); // Force re-render
             } else if (sectionMap[section] !== undefined) {
-                document.getElementById(`${section}-section`).classList.add('active');
                 document.querySelectorAll('.tab')[sectionMap[section]].classList.add('active');
                 document.querySelectorAll('.nav-item')[sectionMap[section]].classList.add('active');
             }
@@ -2862,6 +3099,7 @@
             renderQuests();
             closeModal();
             showToast('⚔️', 'Misión Creada', '¡Nueva aventura comienza!');
+            addNotification('Nueva Misión', `Has creado: ${name}`, '⚔️');
             document.querySelector('form').reset();
         }
 
@@ -2885,12 +3123,9 @@
                 showToast('👥', 'Uniéndose...', `Conectando a Party ${code}`);
                 setTimeout(() => {
                     showToast('✅', '¡Conectado!', 'Ahora eres parte de la Party');
+                    addNotification('Nuevo Miembro', 'Carlos se unió a tu party', '👥');
                 }, 1500);
             }
-        }
-
-        function showNotifications() {
-            showToast('🔔', 'Notificaciones', 'Tienes 2 mensajes nuevos');
         }
 
         function showToast(icon, title, msg) {
@@ -3033,7 +3268,8 @@
             document.getElementById('profile-joined').textContent = gameState.user.joinDate || 'Hoy';
             
             const unlockedCount = gameState.achievements.filter(a => a.unlocked).length;
-            document.getElementById('achievements-count').textContent = unlockedCount;
+            const badge = document.getElementById('achievements-count');
+            if (badge) badge.textContent = unlockedCount;
             
             const grid = document.getElementById('profile-achievements-grid');
             const unlockedAchievements = gameState.achievements.filter(a => a.unlocked).slice(-4);

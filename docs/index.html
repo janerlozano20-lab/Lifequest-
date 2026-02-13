@@ -2706,6 +2706,206 @@
         document.getElementById('profile-modal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeProfileModal();
         });
+                // PROFILE FUNCTIONS
+        let isFirstTime = false;
+
+        function checkFirstTime() {
+            const saved = localStorage.getItem('lifequest_profile');
+            if (!saved) {
+                isFirstTime = true;
+                setTimeout(() => {
+                    openProfileEditModal();
+                    document.getElementById('profile-modal-title').textContent = '🎉 Bienvenido a LifeQuest';
+                    document.getElementById('profile-info-text').style.display = 'block';
+                    document.getElementById('profile-submit-btn').textContent = 'Comenzar Aventura';
+                }, 500);
+            } else {
+                const profile = JSON.parse(saved);
+                gameState.user.name = profile.name;
+                gameState.user.email = profile.email;
+                gameState.user.avatar = profile.avatar;
+                gameState.user.settings = profile.settings || { notifications: true, sounds: true };
+                gameState.user.joinDate = profile.joinDate || new Date().toLocaleDateString();
+                updateProfileDisplay();
+            }
+        }
+
+        function openProfileEditModal() {
+            document.getElementById('profile-edit-modal').classList.add('active');
+            document.getElementById('profile-name-input').value = gameState.user.name;
+            document.getElementById('profile-email-input').value = gameState.user.email || '';
+            renderEditAvatarGrid();
+            updatePreferenceToggles();
+        }
+
+        function closeProfileEditModal() {
+            document.getElementById('profile-edit-modal').classList.remove('active');
+            if (isFirstTime) {
+                document.getElementById('profile-modal-title').textContent = '📝 Editar Perfil';
+                document.getElementById('profile-info-text').style.display = 'none';
+                document.getElementById('profile-submit-btn').textContent = 'Guardar Cambios';
+            }
+        }
+
+        function renderEditAvatarGrid() {
+            const grid = document.getElementById('edit-avatar-grid');
+            grid.innerHTML = avatars.map(avatar => `
+                <div class="avatar-option ${avatar === gameState.user.avatar ? 'selected' : ''}" 
+                     onclick="selectProfileAvatar('${avatar}')">
+                    ${avatar}
+                </div>
+            `).join('');
+        }
+
+        function selectProfileAvatar(avatar) {
+            gameState.user.avatar = avatar;
+            renderEditAvatarGrid();
+        }
+
+        function updatePreferenceToggles() {
+            const notifToggle = document.getElementById('pref-notifications');
+            const soundToggle = document.getElementById('pref-sounds');
+            
+            notifToggle.classList.toggle('active', gameState.user.settings.notifications);
+            soundToggle.classList.toggle('active', gameState.user.settings.sounds);
+        }
+
+        function togglePreference(pref) {
+            gameState.user.settings[pref] = !gameState.user.settings[pref];
+            updatePreferenceToggles();
+        }
+
+        function saveProfileData(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('profile-name-input').value.trim();
+            const email = document.getElementById('profile-email-input').value.trim();
+            
+            if (!name) {
+                showToast('⚠️', 'Error', 'El nombre es obligatorio');
+                return;
+            }
+            
+            gameState.user.name = name;
+            gameState.user.email = email;
+            
+            if (!gameState.user.joinDate) {
+                gameState.user.joinDate = new Date().toLocaleDateString();
+            }
+            
+            const profileData = {
+                name: gameState.user.name,
+                email: gameState.user.email,
+                avatar: gameState.user.avatar,
+                settings: gameState.user.settings,
+                joinDate: gameState.user.joinDate
+            };
+            localStorage.setItem('lifequest_profile', JSON.stringify(profileData));
+            
+            saveGame();
+            updateProfileDisplay();
+            updateUI();
+            closeProfileEditModal();
+            
+            if (isFirstTime) {
+                isFirstTime = false;
+                showToast('🎉', '¡Bienvenido!', `Suerte en tu aventura, ${name}!`);
+            } else {
+                showToast('✅', 'Perfil Actualizado', 'Tus cambios se guardaron');
+            }
+        }
+
+        function updateProfileDisplay() {
+            document.getElementById('profile-display-name').textContent = gameState.user.name;
+            document.getElementById('profile-display-email').textContent = gameState.user.email || 'Sin email';
+            document.getElementById('profile-avatar-emoji').textContent = gameState.user.avatar;
+            document.getElementById('profile-level').textContent = gameState.user.level;
+            document.getElementById('profile-xp').textContent = gameState.user.totalXp;
+            document.getElementById('profile-joined').textContent = gameState.user.joinDate || 'Hoy';
+            document.getElementById('achievements-count').textContent = gameState.achievements.filter(a => a.unlocked).length;
+            
+            const grid = document.getElementById('profile-achievements-grid');
+            const unlockedAchievements = gameState.achievements.filter(a => a.unlocked).slice(-4);
+            grid.innerHTML = unlockedAchievements.map(a => `
+                <div class="achievement-preview unlocked">${a.icon}</div>
+            `).join('');
+            
+            const emptySlots = 4 - unlockedAchievements.length;
+            for (let i = 0; i < emptySlots; i++) {
+                grid.innerHTML += `<div class="achievement-preview">🔒</div>`;
+            }
+        }
+
+        function exportData() {
+            const data = {
+                profile: JSON.parse(localStorage.getItem('lifequest_profile')),
+                game: gameState,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `lifequest-backup-${Date.now()}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showToast('💾', 'Datos Exportados', 'Backup descargado correctamente');
+        }
+
+        function resetData() {
+            if (confirm('⚠️ ¿Estás seguro? Se borrarán TODOS tus datos permanentemente.')) {
+                if (confirm('¿De verdad? Esta acción no se puede deshacer.')) {
+                    localStorage.removeItem('lifequest_data_v2');
+                    localStorage.removeItem('lifequest_profile');
+                    location.reload();
+                }
+            }
+        }
+
+        // Override showSection for profile
+        const originalShowSection = showSection;
+        showSection = function(section) {
+            if (section === 'profile') {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById('profile-section').classList.add('active');
+                document.querySelectorAll('.tab')[3].classList.add('active');
+                updateProfileDisplay();
+            } else {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(`${section}-section`).classList.add('active');
+                
+                const tabs = ['quests', 'party', 'shop', 'profile'];
+                const index = tabs.indexOf(section);
+                if (index >= 0) {
+                    document.querySelectorAll('.tab')[index].classList.add('active');
+                }
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGame();
+            checkFirstTime();
+            renderAll();
+            updateStats();
+            setupChatInput();
+            requestNotificationPermission();
+            setInterval(checkReminders, 60000);
+        });
+
+        // Close profile modal on outside click
+        document.getElementById('profile-edit-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget && !isFirstTime) closeProfileEditModal();
+        });
+    </script>
+
     </script>
 </body>
 </html>

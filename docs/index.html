@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f172a">
-    <title>LifeQuest RPG - Party Edition</title>
+    <title>LifeQuest RPG - Cosmic Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -22,6 +22,8 @@
             --xp: #fbbf24;
             --gold: #f59e0b;
             --party: #06b6d4;
+            --cosmetic: #a855f7;
+            --cosmetic-glow: #c084fc;
         }
 
         * {
@@ -49,13 +51,75 @@
             z-index: -1;
             background: 
                 radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
             animation: bgPulse 8s ease-in-out infinite;
         }
 
         @keyframes bgPulse {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
+        }
+
+        /* COSMETIC AURAS */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .aura-magic {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%);
+            animation: pulse 2s infinite;
+            pointer-events: none;
+        }
+
+        .aura-fire {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(239,68,68,0.3) 0%, rgba(245,158,11,0.2) 50%, transparent 70%);
+            animation: float 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .aura-ice {
+            position: absolute;
+            inset: -5px;
+            border: 2px solid rgba(147,197,253,0.5);
+            border-radius: 50%;
+            animation: rotate-slow 10s linear infinite;
+            pointer-events: none;
+        }
+
+        .aura-gold {
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            border: 3px dashed rgba(251,191,36,0.4);
+            animation: rotate-slow 15s linear infinite;
+            pointer-events: none;
+        }
+
+        .aura-shadow {
+            position: absolute;
+            inset: -10px;
+            background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s infinite;
+            pointer-events: none;
         }
 
         .mobile-header {
@@ -125,6 +189,10 @@
             font-weight: 700;
         }
 
+        .badge.cosmetic {
+            background: var(--cosmetic);
+        }
+
         .quick-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -176,6 +244,11 @@
             overflow: hidden;
         }
 
+        .character-avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
         .character-avatar {
             width: 70px;
             height: 70px;
@@ -184,16 +257,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            flex-shrink: 0;
+            font-size: 2.5rem;
             box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
             position: relative;
             cursor: pointer;
             transition: transform 0.3s;
+            overflow: visible;
         }
 
         .character-avatar:hover {
             transform: scale(1.1);
+        }
+
+        .avatar-hat {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .avatar-glasses {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.4rem;
+            z-index: 10;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+        }
+
+        .avatar-cape {
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            font-size: 2rem;
+            z-index: 5;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
         .level-ring {
@@ -658,6 +760,12 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        .btn-cosmetic {
+            background: linear-gradient(135deg, var(--cosmetic), #9333ea);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
         .btn:active {
             transform: scale(0.95);
         }
@@ -707,7 +815,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             position: relative;
         }
 
@@ -960,6 +1068,261 @@
 
         .chat-send:active {
             transform: scale(0.9);
+        }
+
+        /* COSMETICS SHOP STYLES */
+        .cosmetics-header {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(147, 51, 234, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .cosmetics-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--cosmetic-glow);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+        }
+
+        .cosmetics-subtitle {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .equipped-preview {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .equipped-avatar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .cosmetics-categories {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .cosmetics-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cosmetic-category-btn {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+            padding: 0.6rem 1.2rem;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .cosmetic-category-btn:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: var(--cosmetic);
+        }
+
+        .cosmetic-category-btn.active {
+            background: linear-gradient(135deg, var(--cosmetic), #9333ea);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .cosmetics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cosmetic-item {
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .cosmetic-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--cosmetic);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2);
+        }
+
+        .cosmetic-item.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+
+        .cosmetic-item.locked:hover {
+            transform: none;
+            border-color: rgba(168, 85, 247, 0.2);
+            box-shadow: none;
+        }
+
+        .cosmetic-item.equipped {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .cosmetic-item.purchased {
+            border-color: var(--cosmetic);
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .cosmetic-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .cosmetic-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--light);
+        }
+
+        .cosmetic-type {
+            font-size: 0.75rem;
+            color: var(--cosmetic-glow);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cosmetic-price {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1));
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .cosmetic-item.equipped .cosmetic-price {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .equipped-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--success);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .owned-badge {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: var(--cosmetic);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* COLOR PICKER STYLES */
+        .color-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .color-section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--cosmetic-glow);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.8rem;
+        }
+
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
         /* SHOP STYLES */
@@ -1521,7 +1884,7 @@
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(99, 102, 241, 0.2);
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));
             z-index: 1000;
         }
@@ -1533,7 +1896,7 @@
             gap: 0.2rem;
             color: #64748b;
             text-decoration: none;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             transition: all 0.3s;
             padding: 0.3rem 0;
         }
@@ -1543,7 +1906,7 @@
         }
 
         .nav-icon {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             transition: transform 0.3s;
         }
 
@@ -1594,7 +1957,7 @@
 
         .avatar-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 0.8rem;
             margin-top: 0.5rem;
         }
@@ -1678,8 +2041,12 @@
                 grid-template-columns: repeat(4, 1fr);
             }
             
-            .shop-grid {
+            .shop-grid, .cosmetics-grid {
                 grid-template-columns: repeat(3, 1fr);
+            }
+
+            .avatar-grid {
+                grid-template-columns: repeat(8, 1fr);
             }
         }
 
@@ -1706,20 +2073,27 @@
             margin-bottom: 1.5rem;
         }
 
+        .profile-avatar-large-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+        }
+
         .profile-avatar-large {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 50%;
-            margin: 0 auto 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 4rem;
             position: relative;
             cursor: pointer;
             box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
             transition: transform 0.3s;
+            overflow: visible;
         }
 
         .profile-avatar-large:hover {
@@ -1734,7 +2108,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 2rem;
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -2338,6 +2712,11 @@
             border-bottom-color: var(--gold);
         }
 
+        .shop-tab.cosmetic-tab.active {
+            color: var(--cosmetic);
+            border-bottom-color: var(--cosmetic);
+        }
+
         .empty-rewards {
             text-align: center;
             padding: 3rem 1rem;
@@ -2348,6 +2727,70 @@
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.3;
+        }
+
+        /* COSMETIC EDITOR MODAL */
+        .cosmetic-editor-preview {
+            background: rgba(168, 85, 247, 0.1);
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-avatar-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .preview-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .equipped-items-list {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .equipped-item-tag {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: var(--cosmetic-glow);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .remove-item-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            margin-left: 0.3rem;
+        }
+
+        .cosmetics-inventory {
+            max-height: 300px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -2379,6 +2822,10 @@
                     👥
                     <span class="badge" id="party-badge" style="background: var(--party);">3</span>
                 </button>
+                <button class="icon-btn" onclick="openCosmeticEditor()" title="Personalizar Avatar">
+                    🎨
+                    <span class="badge cosmetic" id="cosmetic-badge" style="display: none;">!</span>
+                </button>
             </div>
         </div>
         <div class="quick-stats">
@@ -2406,9 +2853,11 @@
     </header>
 
     <div class="character-card">
-        <div class="character-avatar" onclick="openProfileModal()">
-            <div class="level-ring"></div>
-            <span id="avatar-emoji">🧙‍♂️</span>
+        <div class="character-avatar-container" onclick="openCosmeticEditor()">
+            <div class="character-avatar" id="header-avatar">
+                <div class="level-ring"></div>
+                <span id="avatar-emoji">🧙‍♂️</span>
+            </div>
         </div>
         <div class="character-info">
             <div class="character-name" id="char-name">Héroe</div>
@@ -2467,6 +2916,48 @@
                 </div>
                 <button type="submit" class="submit-btn">Guardar Cambios</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Cosmetic Editor Modal -->
+    <div class="modal-overlay" id="cosmetic-editor-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🎨 Personalizar Avatar</h3>
+                <button class="modal-close" onclick="closeCosmeticEditor()">×</button>
+            </div>
+            
+            <div class="cosmetic-editor-preview">
+                <div class="preview-avatar-container">
+                    <div class="preview-avatar" id="preview-avatar">
+                        <span id="preview-emoji">🧙‍♂️</span>
+                    </div>
+                </div>
+                <div style="font-family: 'Orbitron', sans-serif; color: var(--cosmetic-glow); margin-bottom: 0.5rem;">
+                    Vista Previa
+                </div>
+                <div class="equipped-items-list" id="equipped-items-list">
+                    <!-- Equipped items will show here -->
+                </div>
+            </div>
+
+            <div class="color-section">
+                <div class="color-section-title">🎨 Color de Ropa</div>
+                <div class="color-grid" id="color-grid">
+                    <!-- Colors will be rendered here -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tus Cosméticos</label>
+                <div class="cosmetics-inventory" id="cosmetics-inventory">
+                    <!-- Owned cosmetics will show here -->
+                </div>
+            </div>
+
+            <button class="btn btn-cosmetic" style="width: 100%; margin-top: 1rem;" onclick="showSection('cosmetics-shop')">
+                🛒 Ir a Tienda de Cosméticos
+            </button>
         </div>
     </div>
 
@@ -2603,6 +3094,7 @@
         <div class="shop-tabs">
             <button class="shop-tab active" onclick="showShopTab('store')">🛒 Tienda</button>
             <button class="shop-tab" onclick="showShopTab('myrewards')">🎁 Mis Recompensas</button>
+            <button class="shop-tab cosmetic-tab" onclick="showShopTab('cosmetics')">🎨 Cosméticos</button>
         </div>
 
         <div id="shop-store">
@@ -2623,6 +3115,32 @@
                 <span class="my-rewards-count" id="my-rewards-count">0</span>
             </div>
             <div class="rewards-list" id="my-rewards-list"></div>
+        </div>
+
+        <div id="shop-cosmetics" style="display: none;">
+            <div class="cosmetics-header">
+                <div class="cosmetics-title">🎨 Tienda de Cosméticos</div>
+                <div class="cosmetics-subtitle">Personaliza tu avatar con estilo único</div>
+                <div class="equipped-preview">
+                    <div class="equipped-avatar" id="shop-cosmetic-avatar">
+                        <span id="shop-cosmetic-emoji">🧙‍♂️</span>
+                    </div>
+                </div>
+                <button class="btn btn-cosmetic" onclick="openCosmeticEditor()">
+                    ✏️ Editar Avatar
+                </button>
+            </div>
+
+            <div class="cosmetics-categories" id="cosmetics-categories">
+                <button class="cosmetic-category-btn active" onclick="filterCosmetics('all')">Todos</button>
+                <button class="cosmetic-category-btn" onclick="filterCosmetics('hat')">🎩 Sombreros</button>
+                <button class="cosmetic-category-btn" onclick="filterCosmetics('glasses')">👓 Gafas</button>
+                <button class="cosmetic-category-btn" onclick="filterCosmetics('cape')">🦸 Capas</button>
+                <button class="cosmetic-category-btn" onclick="filterCosmetics('aura')">✨ Auras</button>
+                <button class="cosmetic-category-btn" onclick="filterCosmetics('accessory')">🎀 Accesorios</button>
+            </div>
+
+            <div class="cosmetics-grid" id="cosmetics-grid"></div>
         </div>
     </section>
 
@@ -2654,9 +3172,11 @@
     <!-- PROFILE SECTION -->
     <section id="profile-section" class="section">
         <div class="profile-header">
-            <div class="profile-avatar-large" onclick="openProfileEditModal()">
-                <span id="profile-avatar-emoji">🧙‍♂️</span>
-                <div class="edit-overlay">✏️</div>
+            <div class="profile-avatar-large-container" onclick="openCosmeticEditor()">
+                <div class="profile-avatar-large" id="profile-avatar-display">
+                    <span id="profile-avatar-emoji">🧙‍♂️</span>
+                    <div class="edit-overlay">✏️</div>
+                </div>
             </div>
             <h2 class="profile-name" id="profile-display-name">Héroe</h2>
             <p class="profile-email" id="profile-display-email">jugador@lifequest.com</p>
@@ -2681,6 +3201,11 @@
                 <span class="menu-icon">✏️</span>
                 <span class="menu-text">Editar Perfil</span>
                 <span class="menu-arrow">›</span>
+            </div>
+            <div class="menu-item" onclick="openCosmeticEditor()">
+                <span class="menu-icon">🎨</span>
+                <span class="menu-text">Personalizar Avatar</span>
+                <span class="menu-badge" id="cosmetics-count">0</span>
             </div>
             <div class="menu-item" onclick="showSection('stats')">
                 <span class="menu-icon">📊</span>
@@ -2922,6 +3447,10 @@
             <span class="nav-icon">🎁</span>
             <span>Tienda</span>
         </a>
+        <a href="#" class="nav-item" onclick="openCosmeticEditor(); return false;">
+            <span class="nav-icon">🎨</span>
+            <span>Avatar</span>
+        </a>
         <a href="#" class="nav-item" onclick="showSection('profile'); return false;">
             <span class="nav-icon">👤</span>
             <span>Perfil</span>
@@ -2929,8 +3458,109 @@
     </nav>
 
     <script>
-        // Extended avatars list - 16 options
-        const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟', '🦁', '🐉', '👑', '🦸', '🧝‍♀️', '🧛', '🤖', '👽'];
+        // EXTENDED AVATARS - 48 Total (16 original + 32 new)
+        const avatars = [
+            // Originales (0-15)
+            '🧙‍♂️', '⚔️', '🏹', '🛡️', '⚡', '🔥', '❄️', '🌟', 
+            '🦁', '🐉', '👑', '🦸', '🧝‍♀️', '🧛', '🤖', '👽',
+            // Nuevos - Humanos/Humanoides (16-27)
+            '👨‍🚀', '👩‍🚀', '🦹', '🧙‍♀️', '🧚', '🧜‍♂️', '🧞‍♂️', '👨‍🎤',
+            '👩‍🎤', '👨‍🎨', '👩‍🔬', '👨‍🍳',
+            // Nuevos - Criaturas (28-39)
+            '👻', '👾', '🤡', '💀', '☠️', '🎃', '🦄', '🦊',
+            '🐺', '🦉', '🦇', '🐱‍👤',
+            // Nuevos - Objetos/Simbólicos (40-47)
+            '🎭', '🎪', '🌙', '☀️', '🔮', '💎', '🗿', '🎎'
+        ];
+
+        // COSMETICS DATABASE - 60+ Items
+        const cosmeticsDB = [
+            // SOMBREROS (15 items)
+            { id: 1, name: 'Corona Real', icon: '👑', type: 'hat', cost: 500, rarity: 'legendary', desc: 'Muestra tu poder' },
+            { id: 2, name: 'Sombrero de Mago', icon: '🎩', type: 'hat', cost: 200, rarity: 'rare', desc: 'Estilo misterioso' },
+            { id: 3, name: 'Gorro de Fiesta', icon: '🎉', type: 'hat', cost: 100, rarity: 'common', desc: 'Siempre celebrando' },
+            { id: 4, name: 'Sombrero de Vaquero', icon: '🤠', type: 'hat', cost: 150, rarity: 'common', desc: 'Estilo salvaje oeste' },
+            { id: 5, name: 'Gorro de Graduación', icon: '🎓', type: 'hat', cost: 300, rarity: 'rare', desc: 'Sabiduría académica' },
+            { id: 6, name: 'Casco de Astronauta', icon: '👨‍🚀', type: 'hat', cost: 400, rarity: 'epic', desc: 'Listo para el espacio' },
+            { id: 7, name: 'Boina Artística', icon: '🎨', type: 'hat', cost: 120, rarity: 'common', desc: 'Toque francés' },
+            { id: 8, name: 'Gorra Snapback', icon: '🧢', type: 'hat', cost: 80, rarity: 'common', desc: 'Estilo urbano' },
+            { id: 9, name: 'Sombrero de Bruja', icon: '🧙‍♀️', type: 'hat', cost: 250, rarity: 'rare', desc: 'Magia oscura' },
+            { id: 10, name: 'Tiara de Princesa', icon: '💎', type: 'hat', cost: 450, rarity: 'epic', desc: 'Realeza elegante' },
+            { id: 11, name: 'Gorro de Invierno', icon: '🧶', type: 'hat', cost: 90, rarity: 'common', desc: 'Calentito' },
+            { id: 12, name: 'Casco de Caballero', icon: '⛑️', type: 'hat', cost: 350, rarity: 'rare', desc: 'Protección medieval' },
+            { id: 13, name: 'Sombrero de Pirata', icon: '🏴‍☠️', type: 'hat', cost: 180, rarity: 'rare', desc: 'Aarrr, tesoro!' },
+            { id: 14, name: 'Halo Dorado', icon: '😇', type: 'hat', cost: 600, rarity: 'legendary', desc: 'Pureza divina' },
+            { id: 15, name: 'Cuernos de Demonio', icon: '😈', type: 'hat', cost: 550, rarity: 'legendary', desc: 'Poder infernal' },
+
+            // GAFAS/ACCESORIOS CARA (10 items)
+            { id: 16, name: 'Gafas de Sol Cool', icon: '😎', type: 'glasses', cost: 120, rarity: 'common', desc: 'Estilo veraniego' },
+            { id: 17, name: 'Monóculo', icon: '🧐', type: 'glasses', cost: 200, rarity: 'rare', desc: 'Elegancia británica' },
+            { id: 18, name: 'Gafas de Nerd', icon: '🤓', type: 'glasses', cost: 100, rarity: 'common', desc: 'Inteligencia visible' },
+            { id: 19, name: 'Máscara de Superhéroe', icon: '🦸', type: 'glasses', cost: 300, rarity: 'rare', desc: 'Identidad secreta' },
+            { id: 20, name: 'Parche de Pirata', icon: '👁️', type: 'glasses', cost: 150, rarity: 'common', desc: 'Mirada intimidante' },
+            { id: 21, name: 'Gafas de Realidad Virtual', icon: '👾', type: 'glasses', cost: 400, rarity: 'epic', desc: 'Futuro digital' },
+            { id: 22, name: 'Máscara de Luchador', icon: '🎭', type: 'glasses', cost: 250, rarity: 'rare', desc: 'Misterio mexicano' },
+            { id: 23, name: 'Gafas de Corazón', icon: '😍', type: 'glasses', cost: 130, rarity: 'common', desc: 'Amoroso' },
+            { id: 24, name: 'Visor Cibernético', icon: '🤖', type: 'glasses', cost: 500, rarity: 'legendary', desc: 'Tecnología avanzada' },
+            { id: 25, name: 'Gafas 3D', icon: '🕶️', type: 'glasses', cost: 110, rarity: 'common', desc: 'Cine en casa' },
+
+            // CAPAS/ESPALDAS (10 items)
+            { id: 26, name: 'Capa de Superman', icon: '🦸‍♂️', type: 'cape', cost: 450, rarity: 'epic', desc: 'Vuelo heroico' },
+            { id: 27, name: 'Alas de Ángel', icon: '👼', type: 'cape', cost: 550, rarity: 'legendary', desc: 'Divinidad' },
+            { id: 28, name: 'Alas de Murciélago', icon: '🦇', type: 'cape', cost: 480, rarity: 'epic', desc: 'Oscuridad' },
+            { id: 29, name: 'Capa de Graduación', icon: '🎓', type: 'cape', cost: 200, rarity: 'rare', desc: 'Logro académico' },
+            { id: 30, name: 'Mochila de Aventurero', icon: '🎒', type: 'cape', cost: 150, rarity: 'common', desc: 'Siempre preparado' },
+            { id: 31, name: 'Capa de Vampiro', icon: '🧛', type: 'cape', cost: 380, rarity: 'rare', desc: 'Gótico elegante' },
+            { id: 32, name: 'Alas de Mariposa', icon: '🦋', type: 'cape', cost: 420, rarity: 'epic', desc: 'Transformación' },
+            { id: 33, name: 'Capa Real', icon: '🤴', type: 'cape', cost: 600, rarity: 'legendary', desc: 'Majestuosidad' },
+            { id: 34, name: 'Chaqueta de Cuero', icon: '🧥', type: 'cape', cost: 180, rarity: 'common', desc: 'Rebelde' },
+            { id: 35, name: 'Capa de Invisibilidad', icon: '👻', type: 'cape', cost: 1000, rarity: 'legendary', desc: 'Harry Potter style' },
+
+            // AURAS/EFECTOS (10 items)
+            { id: 36, name: 'Aura Mágica', icon: '✨', type: 'aura', cost: 800, rarity: 'legendary', desc: 'Poder arcano' },
+            { id: 37, name: 'Fuego Eterno', icon: '🔥', type: 'aura', cost: 700, rarity: 'epic', desc: 'Pasión ardiente' },
+            { id: 38, name: 'Hielo Eterno', icon: '❄️', type: 'aura', cost: 700, rarity: 'epic', desc: 'Frialdad absoluta' },
+            { id: 39, name: 'Rayos Eléctricos', icon: '⚡', type: 'aura', cost: 750, rarity: 'epic', desc: 'Energía pura' },
+            { id: 40, name: 'Brillo Dorado', icon: '🌟', type: 'aura', cost: 900, rarity: 'legendary', desc: 'Éxito radiante' },
+            { id: 41, name: 'Sombras Oscuras', icon: '🌑', type: 'aura', cost: 650, rarity: 'epic', desc: 'Misterio' },
+            { id: 42, name: 'Burbujas', icon: '🫧', type: 'aura', cost: 300, rarity: 'rare', desc: 'Diversión' },
+            { id: 43, name: 'Corazones Flotantes', icon: '💕', type: 'aura', cost: 400, rarity: 'rare', desc: 'Amor' },
+            { id: 44, name: 'Notas Musicales', icon: '🎵', type: 'aura', cost: 350, rarity: 'rare', desc: 'Melodía' },
+            { id: 45, name: 'Dinero Flotante', icon: '💸', type: 'aura', cost: 850, rarity: 'legendary', desc: 'Riqueza' },
+
+            // ACCESORIOS ADICIONALES (15 items)
+            { id: 46, name: 'Varita Mágica', icon: '🪄', type: 'accessory', cost: 300, rarity: 'rare', desc: 'Hechizos' },
+            { id: 47, name: 'Espada Legendaria', icon: '⚔️', type: 'accessory', cost: 500, rarity: 'epic', desc: 'Combate' },
+            { id: 48, name: 'Escudo Dorado', icon: '🛡️', type: 'accessory', cost: 450, rarity: 'epic', desc: 'Defensa' },
+            { id: 49, name: 'Poción Misteriosa', icon: '🧪', type: 'accessory', cost: 200, rarity: 'common', desc: 'Alquimia' },
+            { id: 50, name: 'Libro de Hechizos', icon: '📖', type: 'accessory', cost: 250, rarity: 'rare', desc: 'Conocimiento' },
+            { id: 51, name: 'Mascota Fantasma', icon: '👻', type: 'accessory', cost: 600, rarity: 'legendary', desc: 'Compañero etéreo' },
+            { id: 52, name: 'Globo Terráqueo', icon: '🌍', type: 'accessory', cost: 350, rarity: 'rare', desc: 'Viajero' },
+            { id: 53, name: 'Cámara Fotográfica', icon: '📷', type: 'accessory', cost: 280, rarity: 'common', desc: 'Recuerdos' },
+            { id: 54, name: 'Trofeo de Oro', icon: '🏆', type: 'accessory', cost: 700, rarity: 'epic', desc: 'Campeón' },
+            { id: 55, name: 'Guitarra Eléctrica', icon: '🎸', type: 'accessory', cost: 400, rarity: 'rare', desc: 'Rockstar' },
+            { id: 56, name: 'Paleta de Pintor', icon: '🎨', type: 'accessory', cost: 220, rarity: 'common', desc: 'Artista' },
+            { id: 57, name: 'Taza de Café', icon: '☕', type: 'accessory', cost: 100, rarity: 'common', desc: 'Energía' },
+            { id: 58, name: 'Control de Videojuego', icon: '🎮', type: 'accessory', cost: 180, rarity: 'common', desc: 'Gamer' },
+            { id: 59, name: 'Bola de Cristal', icon: '🔮', type: 'accessory', cost: 550, rarity: 'epic', desc: 'Predicciones' },
+            { id: 60, name: 'Llave Maestra', icon: '🗝️', type: 'accessory', cost: 480, rarity: 'rare', desc: 'Acceso universal' }
+        ];
+
+        // COLOR PALETTES for Avatar Clothing
+        const colorPalettes = [
+            { name: 'Clásico', primary: '#6366f1', secondary: '#ec4899', gradient: 'linear-gradient(135deg, #6366f1, #ec4899)' },
+            { name: 'Fuego', primary: '#ef4444', secondary: '#f59e0b', gradient: 'linear-gradient(135deg, #ef4444, #f59e0b)' },
+            { name: 'Naturaleza', primary: '#10b981', secondary: '#84cc16', gradient: 'linear-gradient(135deg, #10b981, #84cc16)' },
+            { name: 'Océano', primary: '#06b6d4', secondary: '#3b82f6', gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)' },
+            { name: 'Realeza', primary: '#7c3aed', secondary: '#db2777', gradient: 'linear-gradient(135deg, #7c3aed, #db2777)' },
+            { name: 'Oscuro', primary: '#1e293b', secondary: '#475569', gradient: 'linear-gradient(135deg, #1e293b, #475569)' },
+            { name: 'Dorado', primary: '#f59e0b', secondary: '#fbbf24', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
+            { name: 'Hielo', primary: '#93c5fd', secondary: '#e0f2fe', gradient: 'linear-gradient(135deg, #93c5fd, #e0f2fe)' },
+            { name: 'Rosa', primary: '#f472b6', secondary: '#fbcfe8', gradient: 'linear-gradient(135deg, #f472b6, #fbcfe8)' },
+            { name: 'Tóxico', primary: '#84cc16', secondary: '#10b981', gradient: 'linear-gradient(135deg, #84cc16, #10b981)' },
+            { name: 'Atardecer', primary: '#f97316', secondary: '#db2777', gradient: 'linear-gradient(135deg, #f97316, #db2777)' },
+            { name: 'Galaxia', primary: '#4c1d95', secondary: '#1e1b4b', gradient: 'linear-gradient(135deg, #4c1d95, #1e1b4b)' }
+        ];
 
         // 161 Achievements Database
         const achievementsDB = [
@@ -3170,7 +3800,7 @@
             { id: 39, name: 'Ramen Bowl', icon: '🍜', cost: 110, desc: 'Ramen auténtico', category: 'food' },
             { id: 40, name: 'Pho Vietnamita', icon: '🍲', cost: 100, desc: 'Sopa pho completa', category: 'food' },
             { id: 41, name: 'Curry Japonés', icon: '🍛', cost: 105, desc: 'Curry katsu', category: 'food' },
-            { id: 42, name: 'Pad Thai', icon: '🥡', cost: 95, cost: 95, desc: 'Noodles tailandeses', category: 'food' },
+            { id: 42, name: 'Pad Thai', icon: '🥡', cost: 95, desc: 'Noodles tailandeses', category: 'food' },
             { id: 43, name: 'Churros con Chocolate', icon: '🥨', cost: 55, desc: 'Churros españoles', category: 'food' },
             { id: 44, name: 'Crep Dulce', icon: '🥞', cost: 60, desc: 'Crepa con nutella/frutas', category: 'food' },
             { id: 45, name: 'Waffle Belgas', icon: '🧇', cost: 65, desc: 'Waffle con toppings', category: 'food' },
@@ -3210,7 +3840,7 @@
             { id: 75, name: 'Escape Room', icon: '🔐', cost: 450, desc: 'Juego de escape', category: 'experience' },
             { id: 76, name: 'Láser Tag', icon: '🔫', cost: 280, desc: 'Juego de láser', category: 'experience' },
             { id: 77, name: 'Go Karts', icon: '🏎️', cost: 350, desc: 'Carrera de go karts', category: 'experience' },
-            { id: 78, name: 'Mini Golf', icon: '⛳', cost: 200, cost: 200, desc: 'Partida mini golf', category: 'experience' },
+            { id: 78, name: 'Mini Golf', icon: '⛳', cost: 200, desc: 'Partida mini golf', category: 'experience' },
             { id: 79, name: 'Cine IMAX', icon: '🎦', cost: 280, desc: 'Película en IMAX/4DX', category: 'experience' },
             { id: 80, name: 'Concierto Local', icon: '🎸', cost: 600, desc: 'Boletos concierto pequeño', category: 'experience' },
             { id: 81, name: 'Stand-up En Vivo', icon: '🎭', cost: 400, desc: 'Show de comedia en vivo', category: 'experience' },
@@ -3271,6 +3901,7 @@
                 maxHp: 100,
                 streak: 0,
                 avatar: '🧙‍♂️',
+                avatarColor: 0, // Index of colorPalettes
                 totalCompleted: 0,
                 totalXp: 0,
                 settings: {
@@ -3280,8 +3911,16 @@
                 lastLogin: null,
                 currentStreak: 0,
                 longestStreak: 0,
-                lastResetDate: null
+                lastResetDate: null,
+                equippedCosmetics: {
+                    hat: null,
+                    glasses: null,
+                    cape: null,
+                    aura: null,
+                    accessory: null
+                }
             },
+            cosmetics: cosmeticsDB.map(c => ({...c, purchased: false, equipped: false})),
             party: {
                 code: 'XP7-9Q2',
                 members: [
@@ -3327,7 +3966,8 @@
                 currentPerfectDayStreak: 0,
                 shopBuys: 0,
                 profileEdits: 0,
-                bossesDefeated: 0
+                bossesDefeated: 0,
+                cosmeticsBought: 0
             }
         };
 
@@ -3338,6 +3978,7 @@
         let currentEditingQuest = null;
         let confirmCallback = null;
         let currentShopFilter = 'all';
+        let currentCosmeticFilter = 'all';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -3433,7 +4074,7 @@
 
         // Load and Save
         function loadGame() {
-            const saved = localStorage.getItem('lifequest_data_v3');
+            const saved = localStorage.getItem('lifequest_data_v4');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 gameState = { ...gameState, ...parsed };
@@ -3442,8 +4083,13 @@
                 if (parsed.notifications) gameState.notifications = parsed.notifications;
                 if (parsed.stats) gameState.stats = { ...gameState.stats, ...parsed.stats };
                 if (parsed.myRewards) gameState.myRewards = parsed.myRewards;
+                if (parsed.cosmetics) {
+                    // Merge with new cosmetics if any
+                    const savedIds = parsed.cosmetics.map(c => c.id);
+                    const newCosmetics = cosmeticsDB.filter(c => !savedIds.includes(c.id));
+                    gameState.cosmetics = [...parsed.cosmetics, ...newCosmetics.map(c => ({...c, purchased: false, equipped: false}))];
+                }
                 if (parsed.shop) {
-                    // Merge with new items if any
                     const savedIds = parsed.shop.map(i => i.id);
                     const newItems = shopItemsDB.filter(i => !savedIds.includes(i.id));
                     gameState.shop = [...parsed.shop, ...newItems.map(i => ({...i, purchased: false, purchaseDate: null}))];
@@ -3453,7 +4099,7 @@
         }
 
         function saveGame() {
-            localStorage.setItem('lifequest_data_v3', JSON.stringify(gameState));
+            localStorage.setItem('lifequest_data_v4', JSON.stringify(gameState));
         }
 
         // Profile Functions
@@ -3506,6 +4152,328 @@
             updateUI();
             closeProfileModal();
             showToast('✅', 'Perfil Actualizado', 'Cambios guardados correctamente');
+        }
+
+        // COSMETIC SYSTEM FUNCTIONS
+        function openCosmeticEditor() {
+            document.getElementById('cosmetic-editor-modal').classList.add('active');
+            renderCosmeticEditor();
+        }
+
+        function closeCosmeticEditor() {
+            document.getElementById('cosmetic-editor-modal').classList.remove('active');
+        }
+
+        function renderCosmeticEditor() {
+            // Update preview
+            updateAvatarPreview('preview-avatar', 'preview-emoji');
+            
+            // Render color grid
+            const colorGrid = document.getElementById('color-grid');
+            colorGrid.innerHTML = colorPalettes.map((color, index) => `
+                <div class="color-option ${index === gameState.user.avatarColor ? 'selected' : ''}" 
+                     style="background: ${color.gradient}"
+                     onclick="selectAvatarColor(${index})"
+                     title="${color.name}">
+                </div>
+            `).join('');
+            
+            // Render equipped items list
+            renderEquippedItemsList();
+            
+            // Render cosmetics inventory
+            renderCosmeticsInventory();
+        }
+
+        function updateAvatarPreview(containerId, emojiId) {
+            const container = document.getElementById(containerId);
+            const emoji = document.getElementById(emojiId);
+            const color = colorPalettes[gameState.user.avatarColor];
+            
+            container.style.background = color.gradient;
+            container.innerHTML = '';
+            
+            // Add aura if equipped
+            if (gameState.user.equippedCosmetics.aura) {
+                const aura = document.createElement('div');
+                aura.className = `aura-${getAuraClass(gameState.user.equippedCosmetics.aura)}`;
+                container.appendChild(aura);
+            }
+            
+            // Add avatar emoji
+            const avatarSpan = document.createElement('span');
+            avatarSpan.id = emojiId;
+            avatarSpan.textContent = gameState.user.avatar;
+            container.appendChild(avatarSpan);
+            
+            // Add cosmetics layers
+            if (gameState.user.equippedCosmetics.hat) {
+                const hat = document.createElement('div');
+                hat.className = 'avatar-hat';
+                hat.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.hat);
+                container.appendChild(hat);
+            }
+            
+            if (gameState.user.equippedCosmetics.glasses) {
+                const glasses = document.createElement('div');
+                glasses.className = 'avatar-glasses';
+                glasses.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.glasses);
+                container.appendChild(glasses);
+            }
+            
+            if (gameState.user.equippedCosmetics.cape) {
+                const cape = document.createElement('div');
+                cape.className = 'avatar-cape';
+                cape.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.cape);
+                container.appendChild(cape);
+            }
+        }
+
+        function getAuraClass(cosmeticId) {
+            const cosmetic = cosmeticsDB.find(c => c.id === cosmeticId);
+            if (!cosmetic) return 'magic';
+            const auraMap = {
+                36: 'magic', 37: 'fire', 38: 'ice', 39: 'magic',
+                40: 'gold', 41: 'shadow', 42: 'magic', 43: 'magic',
+                44: 'magic', 45: 'gold'
+            };
+            return auraMap[cosmeticId] || 'magic';
+        }
+
+        function getCosmeticIcon(cosmeticId) {
+            const cosmetic = cosmeticsDB.find(c => c.id === cosmeticId);
+            return cosmetic ? cosmetic.icon : '✨';
+        }
+
+        function selectAvatarColor(index) {
+            gameState.user.avatarColor = index;
+            saveGame();
+            renderCosmeticEditor();
+            updateUI();
+            showToast('🎨', 'Color Actualizado', `Paleta ${colorPalettes[index].name} seleccionada`);
+        }
+
+        function renderEquippedItemsList() {
+            const list = document.getElementById('equipped-items-list');
+            const equipped = gameState.user.equippedCosmetics;
+            const equippedItems = [];
+            
+            if (equipped.hat) {
+                const c = cosmeticsDB.find(x => x.id === equipped.hat);
+                equippedItems.push({ type: 'hat', name: c.name, id: c.id, icon: c.icon });
+            }
+            if (equipped.glasses) {
+                const c = cosmeticsDB.find(x => x.id === equipped.glasses);
+                equippedItems.push({ type: 'glasses', name: c.name, id: c.id, icon: c.icon });
+            }
+            if (equipped.cape) {
+                const c = cosmeticsDB.find(x => x.id === equipped.cape);
+                equippedItems.push({ type: 'cape', name: c.name, id: c.id, icon: c.icon });
+            }
+            if (equipped.aura) {
+                const c = cosmeticsDB.find(x => x.id === equipped.aura);
+                equippedItems.push({ type: 'aura', name: c.name, id: c.id, icon: c.icon });
+            }
+            if (equipped.accessory) {
+                const c = cosmeticsDB.find(x => x.id === equipped.accessory);
+                equippedItems.push({ type: 'accessory', name: c.name, id: c.id, icon: c.icon });
+            }
+            
+            if (equippedItems.length === 0) {
+                list.innerHTML = '<span style="color: #64748b; font-size: 0.9rem;">No tienes items equipados</span>';
+            } else {
+                list.innerHTML = equippedItems.map(item => `
+                    <div class="equipped-item-tag">
+                        ${item.icon} ${item.name}
+                        <button class="remove-item-btn" onclick="unequipCosmetic('${item.type}')" title="Desequipar">×</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderCosmeticsInventory() {
+            const container = document.getElementById('cosmetics-inventory');
+            const owned = gameState.cosmetics.filter(c => c.purchased);
+            
+            if (owned.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem 1rem;">
+                        <div class="empty-state-icon">🎨</div>
+                        <div class="empty-state-text">No tienes cosméticos aún</div>
+                        <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.5rem;">
+                            Compra cosméticos en la tienda para personalizar tu avatar
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = owned.map(c => `
+                <div class="cosmetic-item ${c.equipped ? 'equipped' : ''}" 
+                     onclick="${c.equipped ? `unequipCosmetic('${c.type}')` : `equipCosmetic(${c.id})`}"
+                     style="display: inline-block; width: calc(50% - 0.5rem); margin: 0.25rem; vertical-align: top;">
+                    ${c.equipped ? '<span class="equipped-badge">✓ EQUIPADO</span>' : ''}
+                    <span class="cosmetic-icon">${c.icon}</span>
+                    <div class="cosmetic-name">${c.name}</div>
+                    <div class="cosmetic-type">${getTypeName(c.type)}</div>
+                    <div class="cosmetic-price">${c.equipped ? 'EQUIPADO' : 'CLICK PARA EQUIPAR'}</div>
+                </div>
+            `).join('');
+        }
+
+        function getTypeName(type) {
+            const names = {
+                'hat': '🎩 Sombrero',
+                'glasses': '👓 Gafas',
+                'cape': '🦸 Capa',
+                'aura': '✨ Aura',
+                'accessory': '🎀 Accesorio'
+            };
+            return names[type] || type;
+        }
+
+        function equipCosmetic(cosmeticId) {
+            const cosmetic = gameState.cosmetics.find(c => c.id === cosmeticId);
+            if (!cosmetic || !cosmetic.purchased) return;
+            
+            // Unequip any item of same type first
+            gameState.cosmetics.forEach(c => {
+                if (c.type === cosmetic.type) c.equipped = false;
+            });
+            
+            // Unequip from user state
+            gameState.user.equippedCosmetics[cosmetic.type] = null;
+            
+            // Equip new one
+            cosmetic.equipped = true;
+            gameState.user.equippedCosmetics[cosmetic.type] = cosmeticId;
+            
+            saveGame();
+            renderCosmeticEditor();
+            updateUI();
+            showToast('✨', 'Cosmético Equipado', `Has equipado: ${cosmetic.name}`);
+        }
+
+        function unequipCosmetic(type) {
+            const cosmetic = gameState.cosmetics.find(c => c.id === gameState.user.equippedCosmetics[type]);
+            if (cosmetic) cosmetic.equipped = false;
+            gameState.user.equippedCosmetics[type] = null;
+            
+            saveGame();
+            renderCosmeticEditor();
+            updateUI();
+            showToast('👋', 'Cosmético Desequipado', 'Item removido de tu avatar');
+        }
+
+        // COSMETICS SHOP FUNCTIONS
+        function showShopTab(tab) {
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('shop-store').style.display = 'none';
+            document.getElementById('shop-myrewards').style.display = 'none';
+            document.getElementById('shop-cosmetics').style.display = 'none';
+            
+            if (tab === 'store') {
+                document.getElementById('shop-store').style.display = 'block';
+            } else if (tab === 'myrewards') {
+                document.getElementById('shop-myrewards').style.display = 'block';
+                renderMyRewards();
+            } else if (tab === 'cosmetics') {
+                document.getElementById('shop-cosmetics').style.display = 'block';
+                renderCosmeticsShop();
+            }
+        }
+
+        function filterCosmetics(category) {
+            currentCosmeticFilter = category;
+            
+            document.querySelectorAll('.cosmetic-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent.includes('Todos')) || 
+                    (category !== 'all' && btn.textContent.toLowerCase().includes(category))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderCosmeticsShop();
+        }
+
+        function renderCosmeticsShop() {
+            const container = document.getElementById('cosmetics-grid');
+            const filtered = currentCosmeticFilter === 'all' 
+                ? gameState.cosmetics 
+                : gameState.cosmetics.filter(c => c.type === currentCosmeticFilter);
+            
+            // Update preview avatar in shop
+            updateAvatarPreview('shop-cosmetic-avatar', 'shop-cosmetic-emoji');
+            
+            container.innerHTML = filtered.map(c => {
+                const canBuy = gameState.user.gold >= c.cost && !c.purchased;
+                const isPurchased = c.purchased;
+                const isEquipped = c.equipped;
+                
+                return `
+                    <div class="cosmetic-item ${!canBuy && !isPurchased ? 'locked' : ''} ${isEquipped ? 'equipped' : ''} ${isPurchased ? 'purchased' : ''}" 
+                         onclick="${isPurchased ? (isEquipped ? `unequipCosmetic('${c.type}')` : `equipCosmetic(${c.id})`) : (canBuy ? `buyCosmetic(${c.id})` : '')}">
+                        ${isEquipped ? '<span class="equipped-badge">✓ EQUIPADO</span>' : ''}
+                        ${isPurchased && !isEquipped ? '<span class="owned-badge">✓ COMPRADO</span>' : ''}
+                        <span class="cosmetic-icon">${c.icon}</span>
+                        <div class="cosmetic-name">${c.name}</div>
+                        <div class="cosmetic-type">${getTypeName(c.type)} • ${getRarityName(c.rarity)}</div>
+                        <div class="cosmetic-price">
+                            ${isEquipped ? 'EQUIPADO' : isPurchased ? 'CLICK PARA EQUIPAR' : c.cost + ' 🪙'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getRarityName(rarity) {
+            const names = {
+                'common': 'Común',
+                'rare': 'Raro',
+                'epic': 'Épico',
+                'legendary': 'Legendario'
+            };
+            return names[rarity] || rarity;
+        }
+
+        function buyCosmetic(id) {
+            const cosmetic = gameState.cosmetics.find(c => c.id === id);
+            if (!cosmetic || cosmetic.purchased) return;
+            
+            if (gameState.user.gold >= cosmetic.cost) {
+                gameState.user.gold -= cosmetic.cost;
+                cosmetic.purchased = true;
+                cosmetic.purchaseDate = new Date().toLocaleDateString();
+                
+                gameState.stats.cosmeticsBought = (gameState.stats.cosmeticsBought || 0) + 1;
+                
+                showToast('🎨', '¡Cosmético Comprado!', `Has comprado: ${cosmetic.name}`);
+                addNotification('Compra Exitosa', `Has comprado: ${cosmetic.name} por ${cosmetic.cost} oro`, cosmetic.icon);
+                
+                checkAchievements();
+                saveGame();
+                updateStats();
+                renderCosmeticsShop();
+                updateCosmeticBadge();
+            } else {
+                showToast('❌', 'Oro Insuficiente', `Necesitas ${cosmetic.cost} oro para comprar esto`);
+            }
+        }
+
+        function updateCosmeticBadge() {
+            const owned = gameState.cosmetics.filter(c => c.purchased).length;
+            const badge = document.getElementById('cosmetics-count');
+            if (badge) badge.textContent = owned;
+            
+            const navBadge = document.getElementById('cosmetic-badge');
+            const unequipped = gameState.cosmetics.filter(c => c.purchased && !c.equipped).length;
+            if (navBadge) {
+                navBadge.textContent = unequipped > 0 ? '!' : '';
+                navBadge.style.display = unequipped > 0 ? 'flex' : 'none';
+            }
         }
 
         // Notifications
@@ -3565,6 +4533,7 @@
             renderChat();
             renderNotifications();
             updateUI();
+            updateCosmeticBadge();
         }
 
         function renderQuests() {
@@ -3578,7 +4547,7 @@
                 document.getElementById(`${cat}-progress`).textContent = `${completed}/${quests.length} completadas`;
                 
                 container.innerHTML = quests.map(quest => `
-                    <div class="quest-item ${quest.completed ? 'completed' : ''} ${quest.resetting ? 'resetting' : ''}" 
+                    <div class="quest-item ${quest.completed ? 'completed' : ''}" 
                          ondblclick="openQuestEditModal('${cat}', ${quest.id})"
                          title="Doble clic para editar">
                         <div class="quest-checkbox" onclick="event.stopPropagation(); toggleQuest('${cat}', ${quest.id})">
@@ -4053,7 +5022,6 @@
                 item.purchased = true;
                 item.purchaseDate = new Date().toLocaleDateString();
                 
-                // Add to my rewards
                 gameState.myRewards.push({
                     ...item,
                     used: false,
@@ -4072,20 +5040,6 @@
                 renderMyRewards();
             } else {
                 showToast('❌', 'Oro Insuficiente', `Necesitas ${item.cost} oro para comprar esto`);
-            }
-        }
-
-        function showShopTab(tab) {
-            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (tab === 'store') {
-                document.getElementById('shop-store').style.display = 'block';
-                document.getElementById('shop-myrewards').style.display = 'none';
-            } else {
-                document.getElementById('shop-store').style.display = 'none';
-                document.getElementById('shop-myrewards').style.display = 'block';
-                renderMyRewards();
             }
         }
 
@@ -4243,6 +5197,43 @@
             document.getElementById('char-name').textContent = gameState.user.name;
             document.getElementById('char-class').textContent = `Nv. ${gameState.user.level} Aventurero`;
             document.getElementById('avatar-emoji').textContent = gameState.user.avatar;
+            
+            // Update avatar with cosmetics
+            const headerAvatar = document.getElementById('header-avatar');
+            const color = colorPalettes[gameState.user.avatarColor];
+            headerAvatar.style.background = color.gradient;
+            
+            // Clear previous cosmetics
+            headerAvatar.innerHTML = '<div class="level-ring"></div><span id="avatar-emoji">' + gameState.user.avatar + '</span>';
+            
+            // Add equipped cosmetics
+            if (gameState.user.equippedCosmetics.aura) {
+                const aura = document.createElement('div');
+                aura.className = `aura-${getAuraClass(gameState.user.equippedCosmetics.aura)}`;
+                headerAvatar.appendChild(aura);
+            }
+            
+            if (gameState.user.equippedCosmetics.hat) {
+                const hat = document.createElement('div');
+                hat.className = 'avatar-hat';
+                hat.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.hat);
+                headerAvatar.appendChild(hat);
+            }
+            
+            if (gameState.user.equippedCosmetics.glasses) {
+                const glasses = document.createElement('div');
+                glasses.className = 'avatar-glasses';
+                glasses.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.glasses);
+                headerAvatar.appendChild(glasses);
+            }
+            
+            if (gameState.user.equippedCosmetics.cape) {
+                const cape = document.createElement('div');
+                cape.className = 'avatar-cape';
+                cape.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.cape);
+                headerAvatar.appendChild(cape);
+            }
+            
             document.getElementById('hp-bar').style.width = (gameState.user.hp/gameState.user.maxHp*100) + '%';
             document.getElementById('xp-bar').style.width = (gameState.user.xp/gameState.user.xpToNext*100) + '%';
             
@@ -4268,7 +5259,7 @@
                 'quests': 0,
                 'party': 1,
                 'shop': 2,
-                'profile': 3
+                'profile': 4
             };
 
             if (section === 'stats') {
@@ -4281,6 +5272,10 @@
             } else if (section === 'notifications') {
                 document.getElementById('notifications-section').classList.add('active');
                 renderNotifications();
+            } else if (section === 'cosmetics-shop') {
+                showSection('shop');
+                showShopTab('cosmetics');
+                document.querySelectorAll('.shop-tab')[2].click();
             } else if (sectionMap[section] !== undefined) {
                 document.getElementById(`${section}-section`).classList.add('active');
                 document.querySelectorAll('.tab')[sectionMap[section]].classList.add('active');
@@ -4383,6 +5378,10 @@
             if (e.target === e.currentTarget) closeQuestEditModal();
         });
 
+        document.getElementById('cosmetic-editor-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeCosmeticEditor();
+        });
+
         // PROFILE FUNCTIONS
         function checkFirstTime() {
             const saved = localStorage.getItem('lifequest_profile');
@@ -4399,6 +5398,7 @@
                 gameState.user.name = profile.name;
                 gameState.user.email = profile.email;
                 gameState.user.avatar = profile.avatar;
+                gameState.user.avatarColor = profile.avatarColor || 0;
                 gameState.user.settings = profile.settings || { notifications: true, sounds: true };
                 gameState.user.joinDate = profile.joinDate || new Date().toLocaleDateString();
                 updateProfileDisplay();
@@ -4474,6 +5474,7 @@
                 name: gameState.user.name,
                 email: gameState.user.email,
                 avatar: gameState.user.avatar,
+                avatarColor: gameState.user.avatarColor,
                 settings: gameState.user.settings,
                 joinDate: gameState.user.joinDate
             };
@@ -4518,6 +5519,33 @@
                     grid.innerHTML += `<div class="achievement-preview">🔒</div>`;
                 }
             }
+            
+            // Update profile avatar with cosmetics
+            const profileAvatar = document.getElementById('profile-avatar-display');
+            const color = colorPalettes[gameState.user.avatarColor];
+            profileAvatar.style.background = color.gradient;
+            
+            profileAvatar.innerHTML = `
+                <span id="profile-avatar-emoji">${gameState.user.avatar}</span>
+                <div class="edit-overlay">✏️</div>
+            `;
+            
+            if (gameState.user.equippedCosmetics.hat) {
+                const hat = document.createElement('div');
+                hat.className = 'avatar-hat';
+                hat.style.fontSize = '2.5rem';
+                hat.style.top = '-20px';
+                hat.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.hat);
+                profileAvatar.appendChild(hat);
+            }
+            
+            if (gameState.user.equippedCosmetics.glasses) {
+                const glasses = document.createElement('div');
+                glasses.className = 'avatar-glasses';
+                glasses.style.fontSize = '2rem';
+                glasses.textContent = getCosmeticIcon(gameState.user.equippedCosmetics.glasses);
+                profileAvatar.appendChild(glasses);
+            }
         }
 
         function exportData() {
@@ -4552,7 +5580,7 @@
                         'Esta es tu última oportunidad. ¿Deseas continuar?',
                         '🗑️',
                         () => {
-                            localStorage.removeItem('lifequest_data_v3');
+                            localStorage.removeItem('lifequest_data_v4');
                             localStorage.removeItem('lifequest_profile');
                             location.reload();
                         }

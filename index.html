@@ -4322,4 +4322,586 @@ document.addEventListener('DOMContentLoaded', () => {
         colorGrid.appendChild(fragment);
     }
 });
+        // SECCIÓN 3: ESTADO CENTRALIZADO
+
+// ============================================
+// App.State: Patrón Observer con Inmutabilidad
+// ============================================
+
+App.State = (() => {
+    // ========================================
+    // VALIDADORES PRIVADOS
+    // ========================================
+    const validators = {
+        string: (value, field) => {
+            if (typeof value !== 'string') {
+                console.error(`❌ State Error: ${field} debe ser string, recibió ${typeof value}`);
+                return false;
+            }
+            return true;
+        },
+        number: (value, field) => {
+            if (typeof value !== 'number' || isNaN(value)) {
+                console.error(`❌ State Error: ${field} debe ser número válido, recibió ${typeof value}`);
+                return false;
+            }
+            return true;
+        },
+        boolean: (value, field) => {
+            if (typeof value !== 'boolean') {
+                console.error(`❌ State Error: ${field} debe ser boolean, recibió ${typeof value}`);
+                return false;
+            }
+            return true;
+        },
+        array: (value, field) => {
+            if (!Array.isArray(value)) {
+                console.error(`❌ State Error: ${field} debe ser array, recibió ${typeof value}`);
+                return false;
+            }
+            return true;
+        },
+        object: (value, field) => {
+            if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+                console.error(`❌ State Error: ${field} debe ser objeto, recibió ${typeof value}`);
+                return false;
+            }
+            return true;
+        },
+        optional: (validator) => (value, field) => {
+            if (value === undefined || value === null) return true;
+            return validator(value, field);
+        },
+        arrayOf: (itemValidator) => (value, field) => {
+            if (!Array.isArray(value)) {
+                console.error(`❌ State Error: ${field} debe ser array, recibió ${typeof value}`);
+                return false;
+            }
+            let valid = true;
+            value.forEach((item, index) => {
+                if (!itemValidator(item, `${field}[${index}]`)) valid = false;
+            });
+            return valid;
+        },
+        objectWithSchema: (schema) => (value, field) => {
+            if (typeof value !== 'object' || value === null) {
+                console.error(`❌ State Error: ${field} debe ser objeto, recibió ${typeof value}`);
+                return false;
+            }
+            let valid = true;
+            for (const [key, validator] of Object.entries(schema)) {
+                if (!validator(value[key], `${field}.${key}`)) valid = false;
+            }
+            return valid;
+        },
+        range: (min, max) => (value, field) => {
+            if (typeof value !== 'number' || value < min || value > max) {
+                console.error(`❌ State Error: ${field} debe estar entre ${min} y ${max}, recibió ${value}`);
+                return false;
+            }
+            return true;
+        }
+    };
+
+    // ========================================
+    // SCHEMA DE VALIDACIÓN
+    // ========================================
+    const stateSchema = {
+        user: validators.objectWithSchema({
+            name: validators.string,
+            level: validators.range(1, 1000),
+            xp: validators.range(0, 1000000),
+            xpToNext: validators.range(1, 100000),
+            gold: validators.range(0, 9999999),
+            hp: validators.range(0, 9999),
+            maxHp: validators.range(1, 9999),
+            streak: validators.range(0, 10000),
+            avatar: validators.string,
+            avatarColor: validators.string,
+            settings: validators.objectWithSchema({
+                notifications: validators.boolean,
+                sounds: validators.boolean
+            }),
+            equippedCosmetics: validators.object,
+            totalCompleted: validators.range(0, 1000000),
+            totalXp: validators.range(0, 10000000),
+            currentStreak: validators.range(0, 10000),
+            longestStreak: validators.range(0, 10000),
+            joinDate: validators.string
+        }),
+        quests: validators.objectWithSchema({
+            health: validators.arrayOf(validators.object),
+            work: validators.arrayOf(validators.object),
+            mind: validators.arrayOf(validators.object),
+            social: validators.arrayOf(validators.object)
+        }),
+        party: validators.objectWithSchema({
+            code: validators.string,
+            members: validators.array,
+            boss: validators.object,
+            chat: validators.array
+        }),
+        cosmetics: validators.array,
+        shop: validators.array,
+        myRewards: validators.array,
+        achievements: validators.array,
+        notifications: validators.array,
+        stats: validators.object,
+        ui: validators.objectWithSchema({
+            currentSection: validators.string
+        })
+    };
+
+    // ========================================
+    // ESTADO INICIAL
+    // ========================================
+    const initialState = {
+        user: {
+            name: 'Héroe',
+            level: 1,
+            xp: 0,
+            xpToNext: 100,
+            gold: 100,
+            hp: 100,
+            maxHp: 100,
+            streak: 0,
+            avatar: '🧙‍♂️',
+            avatarColor: '#6366f1',
+            settings: {
+                notifications: true,
+                sounds: true
+            },
+            equippedCosmetics: {
+                hat: null,
+                glasses: null,
+                cape: null,
+                aura: null,
+                accessory: null
+            },
+            totalCompleted: 0,
+            totalXp: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            joinDate: new Date().toISOString()
+        },
+        quests: {
+            health: [],
+            work: [],
+            mind: [],
+            social: []
+        },
+        party: {
+            code: 'XP7-9Q2',
+            members: [
+                { id: 1, name: 'Tú', avatar: '🧙‍♂️', level: 1, online: true, isLeader: true, isYou: true },
+                { id: 2, name: 'Ari', avatar: '🧝‍♀️', level: 3, online: true, isLeader: false },
+                { id: 3, name: 'Kael', avatar: '🦸‍♂️', level: 2, online: false, isLeader: false }
+            ],
+            boss: {
+                name: 'Procrastinación Suprema',
+                level: 5,
+                currentHp: 750,
+                maxHp: 1000,
+                xpReward: 500,
+                goldReward: 100,
+                itemReward: 'Cofre Épico'
+            },
+            chat: [
+                { id: 1, author: 'Ari', avatar: '🧝‍♀️', text: '¡Vamos a vencer al jefe!', time: Date.now() - 3600000 },
+                { id: 2, author: 'Kael', avatar: '🦸‍♂️', text: 'Necesito más XP 💪', time: Date.now() - 1800000 },
+                { id: 3, author: 'Tú', avatar: '🧙‍♂️', text: '¡Preparados para la raid!', time: Date.now() - 900000 }
+            ]
+        },
+        cosmetics: App.CONFIG.COSMETICS_DB.map(item => ({ ...item, owned: false, equipped: false })),
+        shop: App.CONFIG.SHOP_ITEMS_DB.map(item => ({ ...item, purchased: false })),
+        myRewards: [],
+        achievements: App.CONFIG.ACHIEVEMENTS_DB.map(ach => ({ ...ach, unlocked: false, unlockedAt: null })),
+        notifications: [
+            { id: 1, title: '¡Bienvenido a LifeQuest!', text: 'Completa misiones para ganar XP', icon: '🎮', read: false, time: Date.now() },
+            { id: 2, title: 'Recompensa diaria', text: '¡Has recibido 50 de oro!', icon: '🪙', read: false, time: Date.now() - 86400000 }
+        ],
+        stats: {
+            totalQuestsCompleted: 0,
+            totalQuestsCreated: 0,
+            totalGoldEarned: 100,
+            totalXpEarned: 0,
+            dailyQuestsCompleted: 0,
+            weeklyQuestsCompleted: 0,
+            categoriesCompleted: { health: 0, work: 0, mind: 0, social: 0 },
+            lastResetDate: new Date().toISOString().split('T')[0]
+        },
+        ui: {
+            currentSection: 'quests',
+            modalOpen: null,
+            toastQueue: [],
+            loading: false
+        }
+    };
+
+    // ========================================
+    // ESTADO PRIVADO
+    // ========================================
+    let _data = structuredClone(initialState);
+    let _subscribers = {};
+    let _history = [structuredClone(initialState)];
+    const MAX_HISTORY = 10;
+
+    // ========================================
+    // UTILIDADES PRIVADAS
+    // ========================================
+    const deepEqual = (a, b) => {
+        if (a === b) return true;
+        if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
+        
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+        
+        if (keysA.length !== keysB.length) return false;
+        
+        return keysA.every(key => deepEqual(a[key], b[key]));
+    };
+
+    const validate = (key, value) => {
+        const validator = stateSchema[key];
+        if (!validator) {
+            console.warn(`⚠️ No hay validador definido para "${key}"`);
+            return true;
+        }
+        return validator(value, key);
+    };
+
+    const notifySubscribers = (key, newValue, oldValue) => {
+        if (!_subscribers[key]) return;
+        _subscribers[key].forEach(callback => {
+            try {
+                callback(structuredClone(newValue), structuredClone(oldValue));
+            } catch (e) {
+                console.error(`Error en suscriptor de "${key}":`, e);
+            }
+        });
+    };
+
+    const takeSnapshot = () => {
+        _history.unshift(structuredClone(_data));
+        if (_history.length > MAX_HISTORY) _history.pop();
+    };
+
+    // ========================================
+    // API PÚBLICA
+    // ========================================
+    return {
+        // Obtener copia inmutable de una clave o todo el estado
+        get: (key) => {
+            if (key === undefined) return structuredClone(_data);
+            if (!(key in _data)) {
+                console.warn(`⚠️ Clave "${key}" no existe en el estado`);
+                return undefined;
+            }
+            return structuredClone(_data[key]);
+        },
+
+        // Actualizar valor con validación y notificación
+        set: (key, value, validateFn = null) => {
+            if (!(key in _data)) {
+                console.error(`❌ No se puede setear "${key}" - no existe en el schema`);
+                return false;
+            }
+
+            // Validación personalizada o por schema
+            if (validateFn && !validateFn(value)) {
+                console.error(`❌ Validación falló para "${key}"`);
+                return false;
+            }
+            
+            if (!validateFn && !validate(key, value)) {
+                return false;
+            }
+
+            const oldValue = structuredClone(_data[key]);
+            
+            // Comparar si realmente cambió
+            if (deepEqual(oldValue, value)) {
+                return true; // No hay cambio, pero no es error
+            }
+
+            // Tomar snapshot antes del cambio
+            takeSnapshot();
+            
+            // Aplicar cambio
+            _data[key] = structuredClone(value);
+            
+            // Notificar
+            notifySubscribers(key, _data[key], oldValue);
+            
+            // Notificar también a suscriptores de cambios globales
+            notifySubscribers('*', { key, value: _data[key] }, { key, value: oldValue });
+            
+            return true;
+        },
+
+        // Suscribirse a cambios en una clave
+        subscribe: (key, callback) => {
+            if (typeof callback !== 'function') {
+                console.error('❌ subscribe requiere callback function');
+                return false;
+            }
+            
+            if (!_subscribers[key]) {
+                _subscribers[key] = [];
+            }
+            
+            if (!_subscribers[key].includes(callback)) {
+                _subscribers[key].push(callback);
+            }
+            
+            return true;
+        },
+
+        // Desuscribirse
+        unsubscribe: (key, callback) => {
+            if (!_subscribers[key]) return false;
+            
+            const index = _subscribers[key].indexOf(callback);
+            if (index !== -1) {
+                _subscribers[key].splice(index, 1);
+                return true;
+            }
+            
+            return false;
+        },
+
+        // Múltiples cambios atómicos
+        batch: (updates) => {
+            takeSnapshot();
+            
+            const oldValues = {};
+            const errors = [];
+            
+            // Validar todos primero
+            for (const [key, value] of Object.entries(updates)) {
+                if (!(key in _data)) {
+                    errors.push(`Clave "${key}" no existe`);
+                    continue;
+                }
+                
+                if (!validate(key, value)) {
+                    errors.push(`Validación falló para "${key}"`);
+                }
+            }
+            
+            if (errors.length > 0) {
+                console.error('❌ Batch cancelado por errores:', errors);
+                return false;
+            }
+            
+            // Aplicar todos
+            for (const [key, value] of Object.entries(updates)) {
+                oldValues[key] = structuredClone(_data[key]);
+                _data[key] = structuredClone(value);
+            }
+            
+            // Notificar después de aplicar todos
+            for (const [key, value] of Object.entries(updates)) {
+                notifySubscribers(key, _data[key], oldValues[key]);
+            }
+            notifySubscribers('*', { batch: updates }, { batch: oldValues });
+            
+            return true;
+        },
+
+        // Historial
+        snapshot: () => {
+            takeSnapshot();
+            return true;
+        },
+
+        restore: (index = 0) => {
+            if (index < 0 || index >= _history.length) {
+                console.error(`❌ Índice de historial inválido: ${index}`);
+                return false;
+            }
+            
+            const oldData = structuredClone(_data);
+            _data = structuredClone(_history[index]);
+            
+            // Notificar todos los cambios
+            for (const key of Object.keys(_data)) {
+                if (!deepEqual(oldData[key], _data[key])) {
+                    notifySubscribers(key, _data[key], oldData[key]);
+                }
+            }
+            notifySubscribers('*', { restored: true }, oldData);
+            
+            return true;
+        },
+
+        getHistory: () => structuredClone(_history),
+
+        // Reset a estado inicial
+        reset: () => {
+            takeSnapshot();
+            const oldData = structuredClone(_data);
+            _data = structuredClone(initialState);
+            
+            for (const key of Object.keys(_data)) {
+                if (!deepEqual(oldData[key], _data[key])) {
+                    notifySubscribers(key, _data[key], oldData[key]);
+                }
+            }
+            notifySubscribers('*', { reset: true }, oldData);
+            
+            return true;
+        },
+
+        // Utilitarios de validación (expuestos para uso externo)
+        validators: validators,
+
+        // Debug (solo en desarrollo)
+        debug: {
+            getRawData: () => _data,
+            getSubscribers: () => ({ ..._subscribers }),
+            getHistoryLength: () => _history.length
+        }
+    };
+})();
+
+// ============================================
+// SUSCRIPCIONES INICIALES
+// ============================================
+
+// Sincronizar UI con cambios de estado
+document.addEventListener('DOMContentLoaded', () => {
+    // Suscribirse a cambios en user para actualizar header
+    App.State.subscribe('user', (newUser, oldUser) => {
+        if (newUser.name !== oldUser.name) {
+            document.getElementById('char-name') && (document.getElementById('char-name').textContent = newUser.name);
+            document.getElementById('profile-display-name') && (document.getElementById('profile-display-name').textContent = newUser.name);
+        }
+        
+        if (newUser.avatar !== oldUser.avatar || newUser.equippedCosmetics !== oldUser.equippedCosmetics) {
+            const avatarEls = ['header-avatar', 'profile-avatar-display', 'preview-avatar', 'shop-cosmetic-avatar'];
+            avatarEls.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const span = el.querySelector('span') || el;
+                    span.textContent = newUser.avatar;
+                }
+            });
+        }
+        
+        if (newUser.level !== oldUser.level) {
+            document.getElementById('char-class') && (document.getElementById('char-class').textContent = `Nv. ${newUser.level} Aventurero`);
+            document.getElementById('profile-level') && (document.getElementById('profile-level').textContent = newUser.level);
+            document.getElementById('current-level') && (document.getElementById('current-level').textContent = newUser.level);
+        }
+        
+        if (newUser.xp !== oldUser.xp || newUser.xpToNext !== oldUser.xpToNext) {
+            const xpPercent = (newUser.xp / newUser.xpToNext) * 100;
+            document.getElementById('xp-bar') && (document.getElementById('xp-bar').style.width = `${xpPercent}%`);
+        }
+        
+        if (newUser.hp !== oldUser.hp || newUser.maxHp !== oldUser.maxHp) {
+            const hpPercent = (newUser.hp / newUser.maxHp) * 100;
+            document.getElementById('hp-bar') && (document.getElementById('hp-bar').style.width = `${hpPercent}%`);
+        }
+        
+        if (newUser.gold !== oldUser.gold) {
+            document.getElementById('stat-gold') && (document.getElementById('stat-gold').textContent = newUser.gold);
+        }
+        
+        if (newUser.streak !== oldUser.streak) {
+            document.getElementById('stat-streak') && (document.getElementById('stat-streak').textContent = newUser.streak);
+        }
+    });
+
+    // Suscribirse a cambios en ui.currentSection
+    App.State.subscribe('ui', (newUi, oldUi) => {
+        if (newUi.currentSection !== oldUi.currentSection) {
+            const sections = ['quests', 'party', 'shop', 'stats', 'profile', 'achievements-detail', 'notifications'];
+            sections.forEach(s => {
+                const el = document.getElementById(`${s}-section`);
+                if (el) el.hidden = s !== newUi.currentSection;
+            });
+            
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                const section = tab.textContent.toLowerCase().includes('misión') ? 'quests' :
+                               tab.textContent.toLowerCase().includes('party') ? 'party' :
+                               tab.textContent.toLowerCase().includes('tienda') ? 'shop' : 'profile';
+                tab.classList.toggle('active', section === newUi.currentSection);
+                tab.setAttribute('aria-selected', section === newUi.currentSection);
+            });
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const section = item.textContent.toLowerCase().includes('misión') ? 'quests' :
+                               item.textContent.toLowerCase().includes('party') ? 'party' :
+                               item.textContent.toLowerCase().includes('tienda') ? 'shop' :
+                               item.textContent.toLowerCase().includes('avatar') ? 'avatar' : 'profile';
+                item.classList.toggle('active', section === newUi.currentSection || (section === 'avatar' && newUi.currentSection === 'cosmetics'));
+            });
+        }
+    });
+
+    // Suscribirse a cambios en notificaciones
+    App.State.subscribe('notifications', (newNotifs) => {
+        const unread = newNotifs.filter(n => !n.read).length;
+        const badge = document.getElementById('notif-badge');
+        if (badge) {
+            badge.style.display = unread > 0 ? 'flex' : 'none';
+            badge.textContent = unread;
+        }
+    });
+
+    // Suscribirse a cambios en cosmetics
+    App.State.subscribe('cosmetics', (newCosmetics) => {
+        const count = newCosmetics.filter(c => c.owned).length;
+        document.getElementById('cosmetics-count') && (document.getElementById('cosmetics-count').textContent = count);
+    });
+
+    // Suscribirse a cambios en achievements
+    App.State.subscribe('achievements', (newAchievements) => {
+        const unlocked = newAchievements.filter(a => a.unlocked).length;
+        document.getElementById('achievements-count') && (document.getElementById('achievements-count').textContent = unlocked);
+        
+        const total = newAchievements.length;
+        const percent = (unlocked / total) * 100;
+        document.getElementById('achievements-progress-bar') && (document.getElementById('achievements-progress-bar').style.width = `${percent}%`);
+        document.getElementById('achievements-progress-text') && (document.getElementById('achievements-progress-text').textContent = `${unlocked} de ${total} logros desbloqueados`);
+    });
+
+    // Suscribirse a cambios en party.members
+    App.State.subscribe('party', (newParty) => {
+        const memberCount = newParty.members.length;
+        document.getElementById('member-count') && (document.getElementById('member-count').textContent = `${memberCount}/4`);
+        document.getElementById('party-badge') && (document.getElementById('party-badge').textContent = memberCount);
+        
+        if (newParty.boss) {
+            const hpPercent = (newParty.boss.currentHp / newParty.boss.maxHp) * 100;
+            document.getElementById('boss-hp-bar') && (document.getElementById('boss-hp-bar').style.width = `${hpPercent}%`);
+            document.getElementById('boss-hp-text') && (document.getElementById('boss-hp-text').textContent = `${newParty.boss.currentHp}/${newParty.boss.maxHp} HP`);
+        }
+    });
+
+    // Suscribirse a cambios en stats
+    App.State.subscribe('stats', (newStats) => {
+        document.getElementById('total-completed') && (document.getElementById('total-completed').textContent = newStats.totalQuestsCompleted);
+        document.getElementById('total-xp') && (document.getElementById('total-xp').textContent = newStats.totalXpEarned);
+        
+        const user = App.State.get('user');
+        document.getElementById('max-streak') && (document.getElementById('max-streak').textContent = user.longestStreak);
+    });
+
+    // Suscribirse a cambios en myRewards
+    App.State.subscribe('myRewards', (newRewards) => {
+        document.getElementById('my-rewards-count') && (document.getElementById('my-rewards-count').textContent = newRewards.length);
+    });
+
+    console.log('✅ Sistema de estado centralizado inicializado');
+});
+
+// ============================================
+// EXPORTAR AL GLOBAL App
+// ============================================
+App.State = App.State;
     </script>

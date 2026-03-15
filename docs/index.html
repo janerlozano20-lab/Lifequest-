@@ -3799,3 +3799,445 @@
     </nav>
 
     <script>
+        // SECCIÓN 2: CONFIGURACIÓN Y UTILIDADES
+
+// ============================================
+// App.CONFIG: Base de datos y configuración
+// ============================================
+const App = window.App || {};
+
+App.CONFIG = {
+    AVATARS: [
+        { id: 1, emoji: '🧙‍♂️', name: 'Mago', keywords: ['mago', 'hechicero', 'magia'] },
+        { id: 2, emoji: '🧝‍♀️', name: 'Elfa', keywords: ['elfo', 'elfa', 'bosque'] },
+        { id: 3, emoji: '🦸‍♂️', name: 'Superhéroe', keywords: ['heroe', 'superheroe', 'capitan'] },
+        { id: 4, emoji: '🧛‍♂️', name: 'Vampiro', keywords: ['vampiro', 'noche', 'oscuro'] },
+        { id: 5, emoji: '🧚‍♀️', name: 'Hada', keywords: ['hada', 'magia', 'brillante'] },
+        { id: 6, emoji: '🧞‍♂️', name: 'Genio', keywords: ['genio', 'deseos', 'lámpara'] },
+        { id: 7, emoji: '🐉', name: 'Dragón', keywords: ['dragon', 'fuego', 'bestia'] },
+        { id: 8, emoji: '🤖', name: 'Robot', keywords: ['robot', 'cyborg', 'mecanico'] },
+        { id: 9, emoji: '👾', name: 'Alien', keywords: ['alien', 'extraterrestre', 'space'] },
+        { id: 10, emoji: '😺', name: 'Gato', keywords: ['gato', 'felino', 'mascota'] },
+        { id: 11, emoji: '🦊', name: 'Zorro', keywords: ['zorro', 'astuto', 'bosque'] },
+        { id: 12, emoji: '🐺', name: 'Lobo', keywords: ['lobo', 'manada', 'noche'] },
+        { id: 13, emoji: '🦁', name: 'León', keywords: ['leon', 'rey', 'selva'] },
+        { id: 14, emoji: '🐯', name: 'Tigre', keywords: ['tigre', 'felino', 'rayas'] },
+        { id: 15, emoji: '🐧', name: 'Pingüino', keywords: ['pinguino', 'hielo', 'polo'] },
+        { id: 16, emoji: '🦉', name: 'Búho', keywords: ['buho', 'sabiduria', 'noche'] },
+        { id: 17, emoji: '🐸', name: 'Rana', keywords: ['rana', 'salto', 'verde'] },
+        { id: 18, emoji: '🐙', name: 'Pulpo', keywords: ['pulpo', 'mar', 'tentaculos'] },
+        { id: 19, emoji: '🦋', name: 'Mariposa', keywords: ['mariposa', 'volar', 'color'] },
+        { id: 20, emoji: '🐝', name: 'Abeja', keywords: ['abeja', 'miel', 'trabajo'] },
+        { id: 21, emoji: '🐞', name: 'Mariquita', keywords: ['mariquita', 'insecto', 'puntos'] },
+        { id: 22, emoji: '🦄', name: 'Unicornio', keywords: ['unicornio', 'magia', 'arcoiris'] },
+        { id: 23, emoji: '🐲', name: 'Dragón Chino', keywords: ['dragon', 'chino', 'fuego'] },
+        { id: 24, emoji: '👽', name: 'Extraterrestre', keywords: ['alien', 'ovni', 'space'] },
+        { id: 25, emoji: '👻', name: 'Fantasma', keywords: ['fantasma', 'espiritu', 'miedo'] },
+        { id: 26, emoji: '💀', name: 'Calavera', keywords: ['calavera', 'muerte', 'pirata'] },
+        { id: 27, emoji: '🎃', name: 'Calabaza', keywords: ['calabaza', 'halloween', 'otoño'] },
+        { id: 28, emoji: '😈', name: 'Diablillo', keywords: ['diablo', 'demonio', 'travesura'] },
+        { id: 29, emoji: '👹', name: 'Oni', keywords: ['oni', 'demonio', 'japones'] },
+        { id: 30, emoji: '👺', name: 'Tengu', keywords: ['tengu', 'demonio', 'japones'] },
+        { id: 31, emoji: '💂‍♂️', name: 'Guardia', keywords: ['guardia', 'reina', 'britanico'] },
+        { id: 32, emoji: '👷‍♂️', name: 'Obrero', keywords: ['obrero', 'construccion', 'casco'] },
+        { id: 33, emoji: '👨‍⚕️', name: 'Doctor', keywords: ['doctor', 'medico', 'salud'] },
+        { id: 34, emoji: '👩‍🌾', name: 'Granjera', keywords: ['granjera', 'campo', 'agricultura'] },
+        { id: 35, emoji: '👨‍🍳', name: 'Cocinero', keywords: ['cocinero', 'chef', 'comida'] },
+        { id: 36, emoji: '👩‍🎓', name: 'Estudiante', keywords: ['estudiante', 'graduada', 'universidad'] },
+        { id: 37, emoji: '👨‍🎤', name: 'Cantante', keywords: ['cantante', 'rock', 'musica'] },
+        { id: 38, emoji: '👩‍🎨', name: 'Artista', keywords: ['artista', 'pintora', 'dibujo'] },
+        { id: 39, emoji: '👨‍🚒', name: 'Bombero', keywords: ['bombero', 'fuego', 'rescate'] },
+        { id: 40, emoji: '👮‍♂️', name: 'Policía', keywords: ['policia', 'seguridad', 'ley'] },
+        { id: 41, emoji: '🕵️‍♂️', name: 'Detective', keywords: ['detective', 'investigador', 'lupa'] },
+        { id: 42, emoji: '💃', name: 'Bailarina', keywords: ['bailarina', 'flamenco', 'danza'] },
+        { id: 43, emoji: '🕴️', name: 'Hombre flotante', keywords: ['flotante', 'negocios', 'traje'] },
+        { id: 44, emoji: '🧘‍♂️', name: 'Yogui', keywords: ['yoga', 'meditacion', 'paz'] },
+        { id: 45, emoji: '🏃‍♂️', name: 'Corredor', keywords: ['corredor', 'running', 'deporte'] },
+        { id: 46, emoji: '🚴‍♂️', name: 'Ciclista', keywords: ['ciclista', 'bicicleta', 'deporte'] },
+        { id: 47, emoji: '🏋️‍♂️', name: 'Gimnasta', keywords: ['gimnasta', 'pesas', 'fitness'] },
+        { id: 48, emoji: '🤺', name: 'Esgrimista', keywords: ['esgrima', 'espada', 'deporte'] }
+    ],
+
+    COSMETICS_DB: (() => {
+        const items = [];
+        const types = ['hat', 'glasses', 'cape', 'aura', 'accessory'];
+        const names = {
+            hat: ['Sombrero Mágico', 'Gorro de Bruja', 'Corona Real', 'Casco Vikingo', 'Sombrero de Copa', 'Diadema Lunar'],
+            glasses: ['Gafas de Sol', 'Monóculo', 'Gafas de Realidad Virtual', 'Lentes de Visión Nocturna', 'Gafas Cibernéticas'],
+            cape: ['Capa Roja', 'Capa Élfica', 'Alas de Ángel', 'Alas de Murciélago', 'Capa Invisible'],
+            aura: ['Aura Llameante', 'Aura Helada', 'Aura Sagrada', 'Aura Oscura', 'Aura Arcoíris', 'Aura Galáctica'],
+            accessory: ['Collar Místico', 'Anillo de Poder', 'Amuleto Antiguo', 'Varita Mágica', 'Báculo Estelar', 'Espada Legendaria']
+        };
+        const rarities = ['común', 'raro', 'épico', 'legendario'];
+        
+        for (let type of types) {
+            for (let i = 0; i < names[type].length; i++) {
+                const rarity = rarities[Math.floor(Math.random() * rarities.length)];
+                const costMultiplier = { 'común': 50, 'raro': 120, 'épico': 300, 'legendario': 800 }[rarity];
+                items.push({
+                    id: `${type}-${i}`,
+                    name: names[type][i],
+                    icon: type === 'hat' ? '🧢' : type === 'glasses' ? '👓' : type === 'cape' ? '🧥' : type === 'aura' ? '✨' : '💍',
+                    type,
+                    cost: costMultiplier + (i * 10),
+                    rarity,
+                    desc: `${names[type][i]} de rareza ${rarity}.`,
+                    owned: false,
+                    equipped: false
+                });
+            }
+        }
+        // Asegurar 60+
+        while (items.length < 60) {
+            items.push({
+                id: `extra-${items.length}`,
+                name: `Cosmético Misterioso ${items.length}`,
+                icon: '🎁',
+                type: 'accessory',
+                cost: 150,
+                rarity: 'raro',
+                desc: 'Un cosmético misterioso.',
+                owned: false,
+                equipped: false
+            });
+        }
+        return items;
+    })(),
+
+    ACHIEVEMENTS_DB: (() => {
+        const categories = ['health', 'work', 'mind', 'social', 'general'];
+        const achievements = [];
+        for (let i = 1; i <= 161; i++) {
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            achievements.push({
+                id: i,
+                name: `Logro ${i}: ${category === 'health' ? 'Saludable' : category === 'work' ? 'Trabajador' : category === 'mind' ? 'Sabio' : category === 'social' ? 'Social' : 'Explorador'}`,
+                desc: `Completa un requisito especial de logro ${i}.`,
+                icon: '🏆',
+                category,
+                requirement: `Requisito oculto del logro ${i}`,
+                type: i % 3 === 0 ? 'daily' : i % 5 === 0 ? 'weekly' : 'general',
+                unlocked: false
+            });
+        }
+        return achievements;
+    })(),
+
+    SHOP_ITEMS_DB: (() => {
+        const categories = ['entertainment', 'food', 'shopping', 'experience', 'luxury'];
+        const items = [];
+        for (let i = 1; i <= 120; i++) {
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const cost = Math.floor(Math.random() * 500) + 50;
+            items.push({
+                id: `shop-${i}`,
+                name: `Recompensa ${i}`,
+                desc: `Disfruta de una experiencia ${category}`,
+                icon: category === 'entertainment' ? '🎬' : category === 'food' ? '🍕' : category === 'shopping' ? '🛍️' : category === 'experience' ? '✨' : '💎',
+                category,
+                cost,
+                purchased: false
+            });
+        }
+        return items;
+    })(),
+
+    COLOR_PALETTES: [
+        { name: 'Cosmic', primary: '#6366f1', secondary: '#ec4899', gradient: 'linear-gradient(135deg, #6366f1, #ec4899)' },
+        { name: 'Nature', primary: '#10b981', secondary: '#f59e0b', gradient: 'linear-gradient(135deg, #10b981, #f59e0b)' },
+        { name: 'Ocean', primary: '#06b6d4', secondary: '#3b82f6', gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)' },
+        { name: 'Sunset', primary: '#f97316', secondary: '#dc2626', gradient: 'linear-gradient(135deg, #f97316, #dc2626)' },
+        { name: 'Royal', primary: '#8b5cf6', secondary: '#d946ef', gradient: 'linear-gradient(135deg, #8b5cf6, #d946ef)' },
+        { name: 'Forest', primary: '#22c55e', secondary: '#15803d', gradient: 'linear-gradient(135deg, #22c55e, #15803d)' },
+        { name: 'Midnight', primary: '#1e293b', secondary: '#334155', gradient: 'linear-gradient(135deg, #1e293b, #334155)' },
+        { name: 'Cherry', primary: '#e11d48', secondary: '#be123c', gradient: 'linear-gradient(135deg, #e11d48, #be123c)' },
+        { name: 'Gold', primary: '#fbbf24', secondary: '#b45309', gradient: 'linear-gradient(135deg, #fbbf24, #b45309)' },
+        { name: 'Emerald', primary: '#2dd4bf', secondary: '#0d9488', gradient: 'linear-gradient(135deg, #2dd4bf, #0d9488)' },
+        { name: 'Lavender', primary: '#a78bfa', secondary: '#8b5cf6', gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)' },
+        { name: 'Rose', primary: '#fb7185', secondary: '#e11d48', gradient: 'linear-gradient(135deg, #fb7185, #e11d48)' }
+    ]
+};
+
+// ============================================
+// App.Utils: Funciones de utilidad (SEGURAS)
+// ============================================
+App.Utils = {
+    // Escape estricto para prevenir XSS
+    escapeHtml: (str) => {
+        if (!str) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(str).replace(/[&<>"']/g, (m) => map[m]);
+    },
+
+    // Sanitize básico (permite solo b, i, em, strong)
+    sanitizeHTML: (html, allowedTags = ['b', 'i', 'em', 'strong']) => {
+        if (!html) return '';
+        const temp = document.createElement('div');
+        temp.textContent = html; // Escapamos todo primero
+        let escaped = temp.textContent;
+        
+        // Permitir etiquetas específicas con regex simple
+        allowedTags.forEach(tag => {
+            const open = new RegExp(`&lt;${tag}&gt;`, 'g');
+            const close = new RegExp(`&lt;/${tag}&gt;`, 'g');
+            escaped = escaped.replace(open, `<${tag}>`).replace(close, `</${tag}>`);
+        });
+        return escaped;
+    },
+
+    // Crear elemento seguro (NUNCA innerHTML)
+    createElement: (tag, attrs = {}, children = []) => {
+        const el = document.createElement(tag);
+        
+        for (const [key, value] of Object.entries(attrs)) {
+            if (key === 'className') {
+                el.className = value;
+            } else if (key === 'dataset') {
+                Object.assign(el.dataset, value);
+            } else if (key.startsWith('on') && typeof value === 'function') {
+                el.addEventListener(key.slice(2), value);
+            } else if (key === 'innerHTML') {
+                console.warn('⚠️ No usar innerHTML, usa children en su lugar');
+            } else {
+                el.setAttribute(key, value);
+            }
+        }
+
+        const appendChild = (child) => {
+            if (typeof child === 'string') {
+                el.appendChild(document.createTextNode(child));
+            } else if (child instanceof Node) {
+                el.appendChild(child);
+            } else if (Array.isArray(child)) {
+                child.forEach(c => appendChild(c));
+            }
+        };
+
+        children.forEach(appendChild);
+        return el;
+    },
+
+    // Asignar texto seguro
+    setText: (element, text) => {
+        if (!element) return;
+        element.textContent = text ?? '';
+    },
+
+    // Formatos
+    formatNumber: (n) => new Intl.NumberFormat('es-ES').format(n || 0),
+    
+    formatDate: (date) => {
+        if (!date) return 'Fecha desconocida';
+        const d = new Date(date);
+        return isNaN(d.getTime()) ? 'Fecha inválida' : d.toLocaleDateString('es-ES');
+    },
+
+    // Debounce optimizado
+    debounce: (fn, delay = 150) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn(...args), delay);
+        };
+    },
+
+    // Throttle simple
+    throttle: (fn, limit = 100) => {
+        let inThrottle;
+        return (...args) => {
+            if (!inThrottle) {
+                fn(...args);
+                inThrottle = setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    },
+
+    // Guardar en localStorage con prefijo
+    saveToStorage: (key, value) => {
+        try {
+            localStorage.setItem(`lifequest_${key}`, JSON.stringify(value));
+        } catch (e) {
+            console.warn('Storage error:', e);
+        }
+    },
+
+    // Cargar desde localStorage
+    loadFromStorage: (key, defaultValue = null) => {
+        try {
+            const item = localStorage.getItem(`lifequest_${key}`);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (e) {
+            console.warn('Storage error:', e);
+            return defaultValue;
+        }
+    }
+};
+
+// ============================================
+// App.AvatarSelector: Virtualizado y optimizado
+// ============================================
+App.AvatarSelector = (() => {
+    // Configuración
+    const VISIBLE_COUNT = 12;
+    const FAVORITES_KEY = 'avatar_favorites';
+    
+    // Estado interno
+    let currentFilter = '';
+    let currentPage = 0;
+    let selectedId = null;
+    let favorites = App.Utils.loadFromStorage(FAVORITES_KEY, []);
+    let allAvatars = App.CONFIG.AVATARS;
+    let filteredAvatars = [...allAvatars];
+    let container = null;
+    let previewEl = null;
+    let gridEl = null;
+    let favoritesContainer = null;
+    let onSelectCallback = null;
+
+    // Virtual render
+    const renderChunk = () => {
+        if (!gridEl) return;
+        
+        // Fragment para mejor performance
+        const fragment = document.createDocumentFragment();
+        const start = currentPage * VISIBLE_COUNT;
+        const end = Math.min(start + VISIBLE_COUNT, filteredAvatars.length);
+        
+        for (let i = start; i < end; i++) {
+            const avatar = filteredAvatars[i];
+            const option = App.Utils.createElement('div', {
+                className: `avatar-option ${avatar.id === selectedId ? 'selected' : ''}`,
+                role: 'option',
+                'aria-selected': avatar.id === selectedId,
+                'data-id': avatar.id,
+                tabindex: '0',
+                onclick: () => selectAvatar(avatar),
+                onkeydown: (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectAvatar(avatar);
+                    }
+                }
+            }, [avatar.emoji]);
+            
+            fragment.appendChild(option);
+        }
+        
+        // Limpiar grid y añadir fragmento
+        while (gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+        gridEl.appendChild(fragment);
+        
+        // Si hay más, cargar siguiente chunk con IntersectionObserver
+        if (end < filteredAvatars.length && gridEl.lastChild) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        currentPage++;
+                        observer.disconnect();
+                        renderChunk();
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            observer.observe(gridEl.lastChild);
+        }
+    };
+
+    const renderFavorites = () => {
+        if (!favoritesContainer) return;
+        
+        const fragment = document.createDocumentFragment();
+        favorites.slice(0, 6).forEach(avatarId => {
+            const avatar = allAvatars.find(a => a.id === avatarId);
+            if (!avatar) return;
+            
+            const btn = App.Utils.createElement('div', {
+                className: 'avatar-favorite-btn',
+                role: 'button',
+                tabindex: '0',
+                'aria-label': `Favorito: ${avatar.name}`,
+                onclick: () => selectAvatar(avatar),
+                onkeydown: (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectAvatar(avatar);
+                    }
+                }
+            }, [avatar.emoji]);
+            
+            fragment.appendChild(btn);
+        });
+        
+        while (favoritesContainer.firstChild) favoritesContainer.removeChild(favoritesContainer.firstChild);
+        favoritesContainer.appendChild(fragment);
+    };
+
+    const updatePreview = (avatar) => {
+        if (previewEl) App.Utils.setText(previewEl, avatar.emoji);
+    };
+
+    const selectAvatar = (avatar) => {
+        selectedId = avatar.id;
+        updatePreview(avatar);
+        
+        // Actualizar clases
+        document.querySelectorAll('.avatar-option').forEach(opt => {
+            const isSelected = opt.dataset.id == avatar.id;
+            opt.classList.toggle('selected', isSelected);
+            opt.setAttribute('aria-selected', isSelected);
+        });
+        
+        // Guardar en favoritos
+        favorites = [avatar.id, ...favorites.filter(id => id !== avatar.id)].slice(0, 10);
+        App.Utils.saveToStorage(FAVORITES_KEY, favorites);
+        renderFavorites();
+        
+        if (onSelectCallback) onSelectCallback(avatar);
+    };
+
+    const filter = (query) => {
+        currentFilter = query.toLowerCase().trim();
+        filteredAvatars = allAvatars.filter(avatar => 
+            avatar.emoji.includes(currentFilter) || 
+            avatar.name.toLowerCase().includes(currentFilter) ||
+            avatar.keywords.some(k => k.includes(currentFilter))
+        );
+        currentPage = 0;
+        renderChunk();
+    };
+
+    const handleKeyboard = (e) => {
+        const options = Array.from(document.querySelectorAll('.avatar-option'));
+        const currentIndex = options.findIndex(opt => opt.classList.contains('selected'));
+        
+        switch(e.key) {
+            case 'ArrowRight':
+            case 'ArrowDown':
+                e.preventDefault();
+                if (options[currentIndex + 1]) {
+                    selectAvatar({ id: options[currentIndex + 1].dataset.id });
+                    options[currentIndex + 1].focus();
+                }
+                break;
+            case 'ArrowLeft':
+            case 'ArrowUp':
+                e.preventDefault();
+                if (options[currentIndex - 1]) {
+                    selectAvatar({ id: options[currentIndex - 1].dataset.id });
+                    options[currentIndex - 1].focus();
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                document.querySelector('.modal-close')?.click();
+                break;
+            case 'Enter':
+                if (e.target.classList.contains('avatar-option')) {
+                    </script>
+            

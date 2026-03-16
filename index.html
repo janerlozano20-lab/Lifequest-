@@ -4904,4 +4904,1072 @@ document.addEventListener('DOMContentLoaded', () => {
 // EXPORTAR AL GLOBAL App
 // ============================================
 App.State = App.State;
+        // SECCIÓN 4: SERVICIOS
+
+// ============================================
+// App.Storage: Gestión de localStorage con versionado y fallbacks
+// ============================================
+App.Storage = (() => {
+    const VERSION = 5;
+    const KEYS = {
+        GAME: 'lifequest_data_v5',
+        PROFILE: 'lifequest_profile_v5'
+    };
+    
+    // Almacenamiento en memoria como fallback
+    let memoryStorage = new Map();
+    
+    // Verificar disponibilidad de localStorage
+    const isLocalStorageAvailable = () => {
+        try {
+            const test = '__storage_test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+    
+    const storageAvailable = isLocalStorageAvailable();
+    
+    // Guardar datos con fallback a memoria
+    const save = (key, data) => {
+        try {
+            if (!key) throw new Error('Key requerida');
+            
+            const serialized = JSON.stringify({
+                version: VERSION,
+                timestamp: Date.now(),
+                data: data
+            });
+            
+            if (storageAvailable) {
+                localStorage.setItem(key, serialized);
+            } else {
+                memoryStorage.set(key, serialized);
+            }
+            
+            // Verificar cuota después de guardar
+            quotaCheck(key, serialized);
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Storage save error:', error);
+            
+            // Fallback a memoria si localStorage falla
+            try {
+                memoryStorage.set(key, JSON.stringify({
+                    version: VERSION,
+                    timestamp: Date.now(),
+                    data: data
+                }));
+                return true;
+            } catch (memoryError) {
+                console.error('❌ Memory fallback failed:', memoryError);
+                return false;
+            }
+        }
+    };
+    
+    // Cargar datos con migración automática
+    const load = (key, defaultValue = null) => {
+        try {
+            let raw = null;
+            
+            if (storageAvailable) {
+                raw = localStorage.getItem(key);
+            }
+            
+            if (!raw && memoryStorage.has(key)) {
+                raw = memoryStorage.get(key);
+            }
+            
+            if (!raw) return defaultValue;
+            
+            const parsed = JSON.parse(raw);
+            
+            // Migrar si es necesario
+            if (parsed.version && parsed.version < VERSION) {
+                const migrated = migrate(parsed.version, parsed.data);
+                save(key, migrated); // Guardar versión migrada
+                return migrated;
+            }
+            
+            return parsed.data || defaultValue;
+        } catch (error) {
+            console.error('❌ Storage load error:', error);
+            return defaultValue;
+        }
+    };
+    
+    // Migración de versiones antiguas
+    const migrate = (fromVersion, data) => {
+        console.log(`🔄 Migrando datos de v${fromVersion} a v${VERSION}`);
+        
+        let migrated = { ...data };
+        
+        try {
+            // v4 -> v5: Añadir campos de streak
+            if (fromVersion < 5) {
+                if (migrated.user) {
+                    migrated.user.currentStreak = migrated.user.streak || 0;
+                    migrated.user.longestStreak = migrated.user.longestStreak || 0;
+                    migrated.user.joinDate = migrated.user.joinDate || new Date().toISOString();
+                }
+                if (migrated.stats) {
+                    migrated.stats.dailyQuestsCompleted = migrated.stats.dailyQuestsCompleted || 0;
+                    migrated.stats.weeklyQuestsCompleted = migrated.stats.weeklyQuestsCompleted || 0;
+                }
+            }
+            
+            // v3 -> v4: Reestructurar cosmetics
+            if (fromVersion < 4) {
+                if (migrated.cosmetics) {
+                    migrated.cosmetics = migrated.cosmetics.map(c => ({
+                        ...c,
+                        equipped: false,
+                        owned: c.owned || false
+                    }));
+                }
+            }
+            
+            // v2 -> v3: Añadir achievements
+            if (fromVersion < 3) {
+                migrated.achievements = migrated.achievements || App.CONFIG.ACHIEVEMENTS_DB.map(ach => ({
+                    ...ach,
+                    unlocked: false,
+                    unlockedAt: null
+                }));
+            }
+            
+            // v1 -> v2: Añadir party
+            if (fromVersion < 2) {
+                migrated.party = migrated.party || {
+                    code: `XP${Math.floor(Math.random() * 100)}-${Math.floor(Math.random() * 100)}`,
+                    members: [],
+                    boss: {
+                        name: 'Procrastinación Suprema',
+                        level: 5,
+                        currentHp: 1000,
+                        maxHp: 1000,
+                        xpReward: 500,
+                        goldReward: 100,
+                        itemReward: 'Cofre Épico'
+                    },
+                    chat: []
+                };
+            }
+            
+            console.log('✅ Migración completada');
+            return migrated;
+        } catch (error) {
+            console.error('❌ Error durante migración:', error);
+            return data; // Retornar datos originales si falla migración
+        }
+    };
+    
+    // Limpiar almacenamiento
+    const clear = () => {
+        try {
+            if (storageAvailable) {
+                localStorage.removeItem(KEYS.GAME);
+                localStorage.removeItem(KEYS.PROFILE);
+            }
+            memoryStorage.clear();
+            return true;
+        } catch (error) {
+            console.error('❌ Storage clear error:', error);
+            return false;
+        }
+    };
+    
+    // Verificar cuota disponible
+    const quotaCheck = (key, data) => {
+        try {
+            if (!storageAvailable) return { available: false, reason: 'localStorage no disponible' };
+            
+            let total = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                const v = localStorage.getItem(k);
+                total += (k?.length || 0) + (v?.length || 0);
+            }
+            
+            // Estimar límite (aprox 5MB en la mayoría de navegadores)
+            const LIMIT = 5 * 1024 * 1024; // 5MB en bytes
+            const used = total;
+            const available = LIMIT - used;
+            const percentUsed = (used / LIMIT) * 100;
+            
+            // Advertencia si queda poco espacio
+            if (percentUsed > 80) {
+                console.warn(`⚠️ Almacenamiento al ${percentUsed.toFixed(1)}% de capacidad`);
+                
+                // Mostrar toast si es crítico
+                if (percentUsed > 95 && App.Toast) {
+                    App.Toast.show({
+                        icon: '⚠️',
+                        title: 'Espacio casi lleno',
+                        message: 'Respalda tus datos pronto'
+                    });
+                }
+            }
+            
+            return {
+                available: percentUsed < 100,
+                used: used,
+                availableBytes: available,
+                percentUsed: percentUsed,
+                limit: LIMIT
+            };
+        } catch (error) {
+            console.error('❌ Quota check error:', error);
+            return { available: false, error: error.message };
+        }
+    };
+    
+    // Backup automático en localStorage alternativo
+    const backup = (data) => {
+        try {
+            const backupKey = `${KEYS.GAME}_backup_${Date.now()}`;
+            save(backupKey, data);
+            
+            // Mantener solo últimos 5 backups
+            const backups = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.includes('_backup_')) {
+                    backups.push(key);
+                }
+            }
+            
+            backups.sort().reverse();
+            while (backups.length > 5) {
+                localStorage.removeItem(backups.pop());
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Backup error:', error);
+            return false;
+        }
+    };
+    
+    return {
+        VERSION,
+        KEYS,
+        save,
+        load,
+        migrate,
+        clear,
+        quotaCheck,
+        backup,
+        isAvailable: () => storageAvailable
+    };
+})();
+
+// ============================================
+// App.Data: Export/Import con validación y checksum
+// ============================================
+App.Data = (() => {
+    // Calcular checksum simple
+    const calculateChecksum = (data) => {
+        try {
+            const str = JSON.stringify(data);
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convertir a 32-bit integer
+            }
+            return hash.toString(16);
+        } catch (error) {
+            console.error('❌ Checksum error:', error);
+            return 'invalid';
+        }
+    };
+    
+    // Validar schema del juego
+    const validateSchema = (data) => {
+        try {
+            if (!data || typeof data !== 'object') {
+                throw new Error('Datos inválidos: no es un objeto');
+            }
+            
+            // Verificar estructura mínima requerida
+            const requiredSections = ['user', 'quests', 'party', 'cosmetics', 'shop', 'achievements', 'stats'];
+            for (const section of requiredSections) {
+                if (!data[section]) {
+                    throw new Error(`Sección requerida faltante: ${section}`);
+                }
+            }
+            
+            // Validar user
+            if (!data.user.name || typeof data.user.name !== 'string') {
+                throw new Error('user.name inválido');
+            }
+            
+            if (typeof data.user.level !== 'number' || data.user.level < 1) {
+                throw new Error('user.level inválido');
+            }
+            
+            // Validar quests
+            const questCategories = ['health', 'work', 'mind', 'social'];
+            for (const cat of questCategories) {
+                if (!Array.isArray(data.quests[cat])) {
+                    throw new Error(`quests.${cat} debe ser array`);
+                }
+            }
+            
+            // Validar arrays principales
+            if (!Array.isArray(data.cosmetics)) {
+                throw new Error('cosmetics debe ser array');
+            }
+            
+            if (!Array.isArray(data.achievements)) {
+                throw new Error('achievements debe ser array');
+            }
+            
+            if (!Array.isArray(data.notifications)) {
+                throw new Error('notifications debe ser array');
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Schema validation error:', error);
+            return false;
+        }
+    };
+    
+    // Exportar datos completos
+    const exportData = () => {
+        try {
+            const gameData = App.State.get();
+            
+            const exportPackage = {
+                version: App.Storage.VERSION,
+                date: new Date().toISOString(),
+                checksum: calculateChecksum(gameData),
+                data: gameData,
+                app: 'LifeQuest RPG',
+                exportId: `LQ_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            };
+            
+            return exportPackage;
+        } catch (error) {
+            console.error('❌ Export error:', error);
+            App.Error.log(error, 'App.Data.export');
+            return null;
+        }
+    };
+    
+    // Importar datos con validación
+    const importData = (jsonString) => {
+        try {
+            if (!jsonString || typeof jsonString !== 'string') {
+                throw new Error('JSON string inválido');
+            }
+            
+            const parsed = JSON.parse(jsonString);
+            
+            // Validar estructura del paquete
+            if (!parsed.version || !parsed.data || !parsed.checksum) {
+                throw new Error('Formato de exportación inválido');
+            }
+            
+            // Validar checksum
+            const calculatedChecksum = calculateChecksum(parsed.data);
+            if (calculatedChecksum !== parsed.checksum) {
+                throw new Error('Checksum no coincide - datos corruptos');
+            }
+            
+            // Validar schema
+            if (!validateSchema(parsed.data)) {
+                throw new Error('Schema de datos inválido');
+            }
+            
+            // Hacer backup antes de importar
+            const currentData = App.State.get();
+            App.Storage.backup(currentData);
+            
+            // Migrar si es necesario
+            let dataToImport = parsed.data;
+            if (parsed.version < App.Storage.VERSION) {
+                dataToImport = App.Storage.migrate(parsed.version, parsed.data);
+            }
+            
+            // Aplicar al estado
+            App.State.batch(dataToImport);
+            
+            // Guardar en storage
+            App.Storage.save(App.Storage.KEYS.GAME, dataToImport);
+            
+            return {
+                success: true,
+                version: parsed.version,
+                date: parsed.date,
+                message: 'Importación exitosa'
+            };
+        } catch (error) {
+            console.error('❌ Import error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    };
+    
+    // Descargar archivo
+    const download = (filename = null) => {
+        try {
+            const exportPackage = exportData();
+            if (!exportPackage) throw new Error('No se pudo generar exportación');
+            
+            const jsonString = JSON.stringify(exportPackage, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || `lifequest_backup_${new Date().toISOString().split('T')[0]}.json`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Download error:', error);
+            App.Error.log(error, 'App.Data.download');
+            return false;
+        }
+    };
+    
+    return {
+        export: exportData,
+        import: importData,
+        validateSchema,
+        download,
+        calculateChecksum
+    };
+})();
+
+// ============================================
+// App.Backup: Rotación automática de backups
+// ============================================
+App.Backup = (() => {
+    const SLOTS = ['backup_1', 'backup_2', 'backup_3'];
+    const BACKUP_INTERVAL = 5 * 60 * 1000; // 5 minutos
+    
+    let autoSaveTimer = null;
+    let lastSaveHash = '';
+    let isEnabled = true;
+    
+    // Calcular hash del estado para detectar cambios
+    const calculateStateHash = () => {
+        try {
+            const state = App.State.get();
+            // Solo considerar partes relevantes para backup
+            const relevant = {
+                user: state.user,
+                quests: state.quests,
+                party: state.party,
+                stats: state.stats
+            };
+            return JSON.stringify(relevant);
+        } catch (error) {
+            console.error('❌ Hash calculation error:', error);
+            return '';
+        }
+    };
+    
+    // Rotar backups (eliminar el más viejo, mover los demás)
+    const rotate = () => {
+        try {
+            // Verificar backups existentes
+            const backups = SLOTS.map(slot => ({
+                slot,
+                data: App.Storage.load(slot, null)
+            })).filter(b => b.data !== null);
+            
+            // Si hay menos de 3 backups, no rotar
+            if (backups.length < SLOTS.length) return;
+            
+            // Ordenar por timestamp
+            backups.sort((a, b) => {
+                const timeA = a.data.timestamp || 0;
+                const timeB = b.data.timestamp || 0;
+                return timeA - timeB;
+            });
+            
+            // Eliminar el más viejo
+            if (backups.length > 0) {
+                App.Storage.save(backups[0].slot, null); // Sobrescribir
+            }
+        } catch (error) {
+            console.error('❌ Backup rotation error:', error);
+        }
+    };
+    
+    // Guardar backup en un slot
+    const save = (slot = null) => {
+        try {
+            if (!isEnabled) return false;
+            
+            const targetSlot = slot || SLOTS[Math.floor(Math.random() * SLOTS.length)];
+            const currentData = App.State.get();
+            
+            // No guardar si no hay cambios
+            const currentHash = calculateStateHash();
+            if (currentHash === lastSaveHash) return false;
+            
+            const backupData = {
+                timestamp: Date.now(),
+                data: currentData,
+                version: App.Storage.VERSION
+            };
+            
+            App.Storage.save(targetSlot, backupData);
+            lastSaveHash = currentHash;
+            
+            console.log(`💾 Backup automático guardado en ${targetSlot}`);
+            return true;
+        } catch (error) {
+            console.error('❌ Backup save error:', error);
+            return false;
+        }
+    };
+    
+    // Restaurar desde backup
+    const restore = (slot) => {
+        try {
+            if (!SLOTS.includes(slot)) {
+                throw new Error(`Slot inválido: ${slot}`);
+            }
+            
+            const backup = App.Storage.load(slot, null);
+            if (!backup) {
+                throw new Error(`No hay backup en ${slot}`);
+            }
+            
+            // Validar backup
+            if (!backup.data || !backup.timestamp) {
+                throw new Error('Backup corrupto');
+            }
+            
+            // Hacer backup del estado actual antes de restaurar
+            save('pre_restore_backup');
+            
+            // Aplicar backup
+            App.State.batch(backup.data);
+            App.Storage.save(App.Storage.KEYS.GAME, backup.data);
+            
+            const restoreDate = new Date(backup.timestamp).toLocaleString();
+            
+            return {
+                success: true,
+                slot,
+                date: restoreDate,
+                message: `Restaurado desde backup de ${restoreDate}`
+            };
+        } catch (error) {
+            console.error('❌ Restore error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    };
+    
+    // Iniciar autoguardado
+    const startAutoSave = () => {
+        if (autoSaveTimer) clearInterval(autoSaveTimer);
+        
+        autoSaveTimer = setInterval(() => {
+            try {
+                if (document.hidden) return; // No guardar si pestaña inactiva
+                save();
+                rotate();
+            } catch (error) {
+                console.error('❌ AutoSave error:', error);
+            }
+        }, BACKUP_INTERVAL);
+        
+        console.log('✅ AutoSave iniciado');
+    };
+    
+    // Detener autoguardado
+    const stopAutoSave = () => {
+        if (autoSaveTimer) {
+            clearInterval(autoSaveTimer);
+            autoSaveTimer = null;
+            console.log('⏹️ AutoSave detenido');
+        }
+    };
+    
+    // Listar backups disponibles
+    const list = () => {
+        try {
+            return SLOTS.map(slot => {
+                const backup = App.Storage.load(slot, null);
+                if (!backup) return null;
+                
+                return {
+                    slot,
+                    timestamp: backup.timestamp,
+                    date: new Date(backup.timestamp).toLocaleString(),
+                    size: JSON.stringify(backup).length
+                };
+            }).filter(b => b !== null);
+        } catch (error) {
+            console.error('❌ List backups error:', error);
+            return [];
+        }
+    };
+    
+    // Habilitar/deshabilitar autoguardado
+    const setEnabled = (enabled) => {
+        isEnabled = enabled;
+        if (enabled) {
+            startAutoSave();
+        } else {
+            stopAutoSave();
+        }
+    };
+    
+    // Suscribirse a cambios de estado para autoguardado bajo demanda
+    App.State.subscribe('*', () => {
+        // Guardar si hay cambios significativos y ha pasado suficiente tiempo
+        if (isEnabled && Math.random() < 0.1) { // 10% de los cambios
+            save();
+        }
+    });
+    
+    return {
+        SLOTS,
+        save,
+        restore,
+        list,
+        startAutoSave,
+        stopAutoSave,
+        setEnabled,
+        rotate
+    };
+})();
+
+// ============================================
+// App.Sync: Sincronización entre pestañas
+// ============================================
+App.Sync = (() => {
+    const SYNC_KEY = 'lifequest_sync';
+    let syncEnabled = true;
+    let lastSync = Date.now();
+    
+    // Iniciar escucha de cambios en localStorage
+    const init = () => {
+        window.addEventListener('storage', handleStorageEvent);
+        console.log('✅ Sync entre pestañas activado');
+    };
+    
+    // Detener escucha
+    const stop = () => {
+        window.removeEventListener('storage', handleStorageEvent);
+        console.log('⏹️ Sync entre pestañas detenido');
+    };
+    
+    // Manejar evento de storage
+    const handleStorageEvent = (event) => {
+        try {
+            if (!syncEnabled) return;
+            
+            // Solo procesar nuestras claves
+            if (!event.key?.startsWith('lifequest_')) return;
+            
+            // Prevenir loops de sincronización
+            if (Date.now() - lastSync < 1000) return;
+            
+            console.log('🔄 Detectado cambio externo en:', event.key);
+            
+            if (event.key === App.Storage.KEYS.GAME && event.newValue) {
+                try {
+                    const externalData = JSON.parse(event.newValue);
+                    
+                    if (externalData.data) {
+                        mergeExternal(externalData.data);
+                    }
+                } catch (parseError) {
+                    console.warn('⚠️ Error parseando datos externos:', parseError);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Storage event handler error:', error);
+        }
+    };
+    
+    // Fusionar datos externos con estado actual
+    const mergeExternal = (externalData) => {
+        try {
+            if (!externalData) return false;
+            
+            const currentData = App.State.get();
+            
+            // Estrategia de merge: timestamp más reciente gana
+            const externalTime = externalData.stats?.lastSync || 0;
+            const currentTime = currentData.stats?.lastSync || 0;
+            
+            if (externalTime <= currentTime) return false;
+            
+            // Backup antes de merge
+            App.Backup.save('pre_merge_backup');
+            
+            // Aplicar merge inteligente
+            const merged = {
+                ...currentData,
+                ...externalData,
+                // Preservar ciertos datos locales
+                notifications: [
+                    ...(currentData.notifications || []),
+                    ...(externalData.notifications || [])
+                ].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i) // Deduplicar
+                .sort((a, b) => (b.time || 0) - (a.time || 0))
+                .slice(0, 50)
+            };
+            
+            // Actualizar timestamp de sync
+            merged.stats = merged.stats || {};
+            merged.stats.lastSync = Date.now();
+            
+            // Aplicar cambios
+            App.State.batch(merged);
+            lastSync = Date.now();
+            
+            console.log('✅ Datos sincronizados entre pestañas');
+            
+            // Mostrar notificación
+            if (App.Toast) {
+                App.Toast.show({
+                    icon: '🔄',
+                    title: 'Datos sincronizados',
+                    message: 'Se detectaron cambios en otra pestaña'
+                });
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Merge external error:', error);
+            return false;
+        }
+    };
+    
+    // Forzar sincronización manual
+    const forceSync = () => {
+        try {
+            const currentData = App.State.get();
+            App.Storage.save(App.Storage.KEYS.GAME, currentData);
+            
+            // Disparar evento manualmente
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: App.Storage.KEYS.GAME,
+                newValue: JSON.stringify({ data: currentData })
+            }));
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Force sync error:', error);
+            return false;
+        }
+    };
+    
+    // Habilitar/deshabilitar sync
+    const setEnabled = (enabled) => {
+        syncEnabled = enabled;
+    };
+    
+    return {
+        init,
+        stop,
+        forceSync,
+        mergeExternal,
+        setEnabled
+    };
+})();
+
+// ============================================
+// App.Error: Error Boundary y logging
+// ============================================
+App.Error = (() => {
+    const MAX_ERRORS = 50;
+    let errorLog = [];
+    
+    // Inicializar captura global de errores
+    const init = () => {
+        // Capturar errores no manejados
+        window.onerror = (message, source, lineno, colno, error) => {
+            log({
+                type: 'uncaught',
+                message,
+                source,
+                line: lineno,
+                column: colno,
+                stack: error?.stack,
+                timestamp: Date.now()
+            });
+            
+            // Mostrar toast amigable
+            showErrorToast('Error inesperado', 'La aplicación se recuperó automáticamente');
+            
+            return false; // Permitir manejo por defecto también
+        };
+        
+        // Capturar promesas rechazadas
+        window.onunhandledrejection = (event) => {
+            log({
+                type: 'unhandledrejection',
+                message: event.reason?.message || 'Promesa rechazada',
+                stack: event.reason?.stack,
+                reason: event.reason,
+                timestamp: Date.now()
+            });
+            
+            showErrorToast('Error en operación', 'La operación no pudo completarse');
+        };
+        
+        console.log('✅ Error Boundary inicializado');
+    };
+    
+    // Loguear error
+    const log = (errorData) => {
+        try {
+            const errorEntry = {
+                id: `err_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                ...errorData,
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                appState: getSafeStateSnapshot()
+            };
+            
+            errorLog.unshift(errorEntry);
+            
+            // Mantener tamaño limitado
+            if (errorLog.length > MAX_ERRORS) {
+                errorLog = errorLog.slice(0, MAX_ERRORS);
+            }
+            
+            // Guardar en localStorage para diagnóstico
+            try {
+                const stored = JSON.parse(localStorage.getItem('lifequest_error_log') || '[]');
+                stored.unshift(errorEntry);
+                localStorage.setItem('lifequest_error_log', JSON.stringify(stored.slice(0, 20)));
+            } catch (e) {
+                // Ignorar errores de storage
+            }
+            
+            console.error('❌ Error registrado:', errorEntry);
+            
+            // Hacer backup automático en errores críticos
+            if (isCriticalError(errorData)) {
+                App.Backup.save('critical_error_backup');
+            }
+            
+            return errorEntry.id;
+        } catch (loggingError) {
+            console.error('❌ Error logging failed:', loggingError);
+            return null;
+        }
+    };
+    
+    // Obtener snapshot seguro del estado (sin datos sensibles)
+    const getSafeStateSnapshot = () => {
+        try {
+            const state = App.State.get();
+            return {
+                user: {
+                    level: state.user?.level,
+                    xp: state.user?.xp,
+                    gold: state.user?.gold,
+                    streak: state.user?.streak
+                },
+                stats: state.stats,
+                ui: state.ui?.currentSection
+            };
+        } catch (e) {
+            return { error: 'No se pudo obtener estado' };
+        }
+    };
+    
+    // Determinar si es error crítico
+    const isCriticalError = (errorData) => {
+        const criticalPatterns = [
+            'corrupt',
+            'schema',
+            'validation',
+            'quota',
+            'storage',
+            'memory'
+        ];
+        
+        const message = errorData.message?.toLowerCase() || '';
+        return criticalPatterns.some(pattern => message.includes(pattern));
+    };
+    
+    // Mostrar toast de error
+    const showErrorToast = (title, message) => {
+        if (App.Toast) {
+            App.Toast.show({
+                icon: '⚠️',
+                title,
+                message,
+                duration: 5000,
+                type: 'error'
+            });
+        } else {
+            console.warn('Toast no disponible:', title, message);
+        }
+    };
+    
+    // Obtener últimos errores
+    const getRecentErrors = (limit = 10) => {
+        return errorLog.slice(0, limit);
+    };
+    
+    // Limpiar log
+    const clearLog = () => {
+        errorLog = [];
+        localStorage.removeItem('lifequest_error_log');
+    };
+    
+    // Exportar log para diagnóstico
+    const exportLog = () => {
+        return {
+            errors: errorLog,
+            timestamp: Date.now(),
+            appVersion: App.Storage.VERSION
+        };
+    };
+    
+    return {
+        init,
+        log,
+        getRecentErrors,
+        clearLog,
+        exportLog,
+        showErrorToast
+    };
+})();
+
+// ============================================
+// App.Toast: Sistema de notificaciones emergentes
+// ============================================
+App.Toast = (() => {
+    const container = document.getElementById('toast-container');
+    
+    const show = ({ icon = 'ℹ️', title, message, duration = 3000, type = 'info' }) => {
+        if (!container) return;
+        
+        try {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            // Configurar color según tipo
+            const colors = {
+                success: 'var(--success)',
+                error: 'var(--danger)',
+                warning: 'var(--warning)',
+                info: 'var(--primary)'
+            };
+            
+            toast.style.borderLeftColor = colors[type] || colors.info;
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">
+                    <h4>${App.Utils.escapeHtml(title)}</h4>
+                    <p>${App.Utils.escapeHtml(message)}</p>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto-remover
+            setTimeout(() => {
+                if (toast.parentNode === container) {
+                    toast.style.animation = 'fadeOut 0.3s';
+                    setTimeout(() => {
+                        if (toast.parentNode === container) {
+                            container.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, duration);
+            
+            // Manejar click para cerrar
+            toast.addEventListener('click', () => {
+                if (toast.parentNode === container) {
+                    container.removeChild(toast);
+                }
+            });
+            
+        } catch (error) {
+            console.error('❌ Toast error:', error);
+        }
+    };
+    
+    return { show };
+})();
+
+// ============================================
+// INICIALIZACIÓN DE SERVICIOS
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Error Boundary primero
+    App.Error.init();
+    
+    // Cargar datos guardados
+    try {
+        const savedData = App.Storage.load(App.Storage.KEYS.GAME);
+        if (savedData) {
+            App.State.batch(savedData);
+            console.log('✅ Datos cargados desde storage');
+        }
+    } catch (error) {
+        App.Error.log({
+            type: 'init',
+            message: 'Error cargando datos guardados',
+            error: error.message
+        });
+    }
+    
+    // Inicializar sincronización entre pestañas
+    App.Sync.init();
+    
+    // Iniciar autoguardado
+    App.Backup.startAutoSave();
+    
+    // Verificar cuota de almacenamiento
+    setTimeout(() => {
+        const quota = App.Storage.quotaCheck();
+        if (quota.percentUsed > 90) {
+            App.Toast.show({
+                icon: '⚠️',
+                title: 'Espacio de almacenamiento bajo',
+                message: 'Considera exportar tus datos como respaldo'
+            });
+        }
+    }, 2000);
+    
+    console.log('✅ Todos los servicios inicializados correctamente');
+});
+
+// ============================================
+// EXPORTAR AL GLOBAL App
+// ============================================
+App.Storage = App.Storage;
+App.Data = App.Data;
+App.Backup = App.Backup;
+App.Sync = App.Sync;
+App.Error = App.Error;
+App.Toast = App.Toast;
     </script>
